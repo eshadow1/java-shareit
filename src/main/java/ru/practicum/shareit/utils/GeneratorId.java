@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.utils;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

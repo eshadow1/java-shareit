@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.utils.exception;
 
 public class ContainsTrueException extends RuntimeException {
     public ContainsTrueException(String message) {

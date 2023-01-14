@@ -2,6 +2,8 @@ package ru.practicum.shareit.user;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.utils.exception.ContainsFalseException;
+import ru.practicum.shareit.utils.exception.ContainsTrueException;
 
 import java.util.List;
 
