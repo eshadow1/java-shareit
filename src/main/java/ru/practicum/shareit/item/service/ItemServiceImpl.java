@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.MappingItem;
 import ru.practicum.shareit.item.repository.ItemStorage;
-import ru.practicum.shareit.user.UserStorage;
+import ru.practicum.shareit.user.repository.UserStorage;
 import ru.practicum.shareit.utils.exception.ContainsFalseException;
 import ru.practicum.shareit.utils.exception.UserNotFoundException;
 

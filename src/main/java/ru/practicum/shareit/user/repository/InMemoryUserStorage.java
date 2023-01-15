@@ -1,7 +1,8 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.repository;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.utils.GeneratorId;
 
 import java.util.*;

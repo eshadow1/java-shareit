@@ -1,7 +1,9 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.service;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserStorage;
 import ru.practicum.shareit.utils.exception.ContainsFalseException;
 import ru.practicum.shareit.utils.exception.ContainsTrueException;
 
@@ -23,7 +25,9 @@ public class UserService {
 
     public User updateUser(int id, User user) {
         checkedUserContains(id);
-        if (user.getEmail() != null && !user.getEmail().isEmpty()) {
+        if (user.getEmail() != null
+                && !user.getEmail().isEmpty()
+                && checkedUpdatedEmail(id, user.getEmail())) {
             checkedUserContainsByEmail(user.getEmail());
         }
 
@@ -31,6 +35,9 @@ public class UserService {
         return userStorage.update(newUser);
     }
 
+    private boolean checkedUpdatedEmail(int id, String email) {
+        return !userStorage.get(id).getEmail().equals(email);
+    }
 
     public User getUser(int userId) {
         checkedUserContains(userId);
@@ -51,7 +58,6 @@ public class UserService {
             throw new ContainsFalseException("Пользователь с id " + id + " не найден");
         }
     }
-
 
     private void checkedUserContainsByEmail(String email) {
         if (userStorage.contains(email)) {
