@@ -69,8 +69,9 @@ public class ItemController {
     public List<Item> searchItems(@RequestHeader(name = "X-Sharer-User-Id") int userId,
                                   @RequestParam(defaultValue = "") String text) {
         log.info("Получен запрос на поиск " + text);
-        if (text.isEmpty())
+        if (text.isEmpty()) {
             return new ArrayList<>();
+        }
 
         return itemService.searchItems(userId, text);
     }

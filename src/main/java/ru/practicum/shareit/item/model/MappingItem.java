@@ -2,8 +2,8 @@ package ru.practicum.shareit.item.model;
 
 import ru.practicum.shareit.item.dto.ItemDto;
 
-public class MappingItem {
-    static public Item fromItemDTO(ItemDto itemDto, int userId) {
+public final class MappingItem {
+    public static Item fromItemDTO(final ItemDto itemDto, final int userId) {
         return Item.builder()
                 .description(itemDto.getDescription())
                 .available(itemDto.getAvailable())
@@ -12,13 +12,14 @@ public class MappingItem {
                 .build();
     }
 
-    public static Item update(Item item, Item newItem) {
+    public static Item update(final Item item, final Item newItem) {
         var bufItem = item.toBuilder();
         if (newItem.getName() != null && !newItem.getName().isEmpty()) {
             bufItem.name(newItem.getName());
         }
 
-        if (newItem.getDescription() != null && !newItem.getDescription().isEmpty()) {
+        if (newItem.getDescription() != null
+                && !newItem.getDescription().isEmpty()) {
             bufItem.description(newItem.getDescription());
         }
 
@@ -27,5 +28,8 @@ public class MappingItem {
         }
 
         return bufItem.build();
+    }
+
+    private MappingItem() {
     }
 }
