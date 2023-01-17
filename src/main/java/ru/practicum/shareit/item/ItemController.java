@@ -2,16 +2,16 @@ package ru.practicum.shareit.item;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.model.MappingItem;
+import ru.practicum.shareit.item.dto.ReceivedItemDto;
+import ru.practicum.shareit.item.dto.SentItemDto;
+import ru.practicum.shareit.item.model.ItemMapper;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * TODO Sprint add-controllers.
@@ -28,52 +28,56 @@ public class ItemController {
     }
 
     @PostMapping
-    public ResponseEntity<Item> addItem(@RequestHeader(name = "X-Sharer-User-Id") int userId,
-                                        @Valid @RequestBody ItemDto itemDto) {
-        log.info("Получен запрос на добавление предмета: " + itemDto);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(itemService.addItem(MappingItem.fromItemDTO(itemDto, userId)));
+    @ResponseStatus(HttpStatus.CREATED)
+    public SentItemDto addItem(@RequestHeader(name = "X-Sharer-User-Id") int userId,
+                               @Valid @RequestBody ReceivedItemDto receivedItemDto) {
+        log.info("Получен запрос на добавление предмета: " + receivedItemDto);
+
+        return ItemMapper.toSentItemDto(itemService.addItem(ItemMapper.fromReceivedItemDto(receivedItemDto, userId)));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Item> updateItem(@RequestHeader(value = "X-Sharer-User-Id") int userId,
-                                           @PathVariable int id, @RequestBody ItemDto itemDto) {
-        log.info("Получен запрос на обновление предмета " + id + ": " + itemDto);
+    public SentItemDto updateItem(@RequestHeader(value = "X-Sharer-User-Id") int userId,
+                                  @PathVariable int id, @RequestBody ReceivedItemDto receivedItemDto) {
+        log.info("Получен запрос на обновление предмета " + id + ": " + receivedItemDto);
 
-
-        return ResponseEntity.status(HttpStatus.OK).body(itemService.updateItem(id, MappingItem.fromItemDTO(itemDto, userId)));
+        return ItemMapper.toSentItemDto(itemService.updateItem(id, ItemMapper.fromReceivedItemDto(receivedItemDto, userId)));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Item> getItem(@PathVariable int id) {
+    public SentItemDto getItem(@PathVariable int id) {
         log.info("Получен запрос на получение предмета " + id);
 
-        return ResponseEntity.status(HttpStatus.OK).body(itemService.getItem(id));
+        return ItemMapper.toSentItemDto(itemService.getItem(id));
     }
 
     @GetMapping
-    public List<Item> getItems(@RequestHeader(name = "X-Sharer-User-Id") int userId) {
+    public List<SentItemDto> getItems(@RequestHeader(name = "X-Sharer-User-Id") int userId) {
         log.info("Получен запрос на получение всех предметов");
-        return itemService.getAllItemsByUser(userId);
+
+        return itemService.getAllItemsByUser(userId).stream()
+                .map(ItemMapper::toSentItemDto)
+                .collect(Collectors.toList());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Item> removeItem(@PathVariable int id) {
+    public SentItemDto removeItem(@PathVariable int id) {
         log.info("Получен запрос на удаление предмета " + id);
 
-        return ResponseEntity.status(HttpStatus.OK).body(itemService.removeItem(id));
+        return ItemMapper.toSentItemDto(itemService.removeItem(id));
     }
 
     @GetMapping("/search")
-    public List<Item> searchItems(@RequestHeader(name = "X-Sharer-User-Id") int userId,
-                                  @RequestParam(defaultValue = "") String text) {
+    public List<SentItemDto> searchItems(@RequestHeader(name = "X-Sharer-User-Id") int userId,
+                                         @RequestParam(defaultValue = "") String text) {
         log.info("Получен запрос на поиск " + text);
+
         if (text.isEmpty()) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
-        return itemService.searchItems(userId, text);
+        return itemService.searchItems(userId, text).stream()
+                .map(ItemMapper::toSentItemDto)
+                .collect(Collectors.toList());
     }
-
 }

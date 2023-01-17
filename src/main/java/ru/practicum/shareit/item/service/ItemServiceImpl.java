@@ -3,7 +3,7 @@ package ru.practicum.shareit.item.service;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.model.MappingItem;
+import ru.practicum.shareit.item.model.ItemMapper;
 import ru.practicum.shareit.item.repository.ItemStorage;
 import ru.practicum.shareit.user.repository.UserStorage;
 import ru.practicum.shareit.utils.exception.ContainsFalseException;
@@ -35,7 +35,7 @@ public class ItemServiceImpl implements ItemService {
         var oldItem = itemStorage.get(id);
         checkedItemForUser(oldItem.getOwner(), item.getOwner());
 
-        oldItem = MappingItem.update(oldItem, item);
+        oldItem = ItemMapper.update(oldItem, item);
         itemStorage.update(oldItem);
         return oldItem;
     }
