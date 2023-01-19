@@ -1,20 +1,19 @@
 package ru.practicum.shareit.item.model;
 
-import ru.practicum.shareit.item.dto.ReceivedItemDto;
-import ru.practicum.shareit.item.dto.SentItemDto;
+import ru.practicum.shareit.item.dto.ItemDto;
 
 public final class ItemMapper {
-    public static Item fromReceivedItemDto(final ReceivedItemDto receivedItemDto, final int userId) {
+    public static Item fromItemDto(final ItemDto itemDto, final int userId) {
         return Item.builder()
-                .description(receivedItemDto.getDescription())
-                .available(receivedItemDto.getAvailable())
-                .name(receivedItemDto.getName())
+                .description(itemDto.getDescription())
+                .available(itemDto.getAvailable())
+                .name(itemDto.getName())
                 .owner(userId)
                 .build();
     }
 
-    public static SentItemDto toSentItemDto(final Item item) {
-        return SentItemDto.builder()
+    public static ItemDto toItemDto(final Item item) {
+        return ItemDto.builder()
                 .id(item.getId())
                 .name(item.getName())
                 .description(item.getDescription())

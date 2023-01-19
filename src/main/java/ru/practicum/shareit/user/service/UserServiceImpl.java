@@ -2,8 +2,6 @@ package ru.practicum.shareit.user.service;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserStorage;
 import ru.practicum.shareit.utils.exception.ContainsFalseException;
@@ -25,7 +23,7 @@ public class UserServiceImpl implements UserService {
         return userStorage.add(user);
     }
 
-    public User updateUser(int id, UserDto user) {
+    public User updateUser(int id, User user) {
         checkedUserContains(id);
         if (user.getEmail() != null
                 && !user.getEmail().isEmpty()
@@ -33,7 +31,7 @@ public class UserServiceImpl implements UserService {
             checkedUserContainsByEmail(user.getEmail());
         }
 
-        return userStorage.update(UserMapper.fromUserDto(user, id));
+        return userStorage.update(user);
     }
 
     public User getUser(int userId) {

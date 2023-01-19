@@ -60,7 +60,7 @@ public class ItemServiceImpl implements ItemService {
     public List<Item> searchItems(int userId, String text) {
         checkedUserContains(userId);
 
-        return itemStorage.searchItems(text.toLowerCase());
+        return itemStorage.searchItems(text);
     }
 
     private void checkedItemContains(int id) {

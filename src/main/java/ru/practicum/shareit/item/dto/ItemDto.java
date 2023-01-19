@@ -7,14 +7,16 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+
+/**
+ * TODO Sprint add-controllers.
+ */
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class SentItemDto {
-    @Positive
+public class ItemDto {
     private Integer id;
 
     @NotBlank
@@ -26,9 +28,7 @@ public class SentItemDto {
     @NotNull
     private Boolean available;
 
-    @Positive
     private Integer owner;
 
-    @Positive
     private Integer request;
 }

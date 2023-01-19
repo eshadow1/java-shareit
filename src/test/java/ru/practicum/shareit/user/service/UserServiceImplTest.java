@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.model.UserMapper;
 import ru.practicum.shareit.user.repository.InMemoryUserStorage;
 import ru.practicum.shareit.utils.GeneratorId;
 import ru.practicum.shareit.utils.exception.ContainsFalseException;
@@ -43,14 +44,14 @@ class UserServiceImplTest {
     @Test
     void updateUser() {
         userServiceImpl.addUser(correctUser);
-        userServiceImpl.updateUser(checkCorrectUser.getId(), updateCorrectUser);
+        userServiceImpl.updateUser(checkCorrectUser.getId(), UserMapper.fromUserDto(updateCorrectUser, checkCorrectUser.getId()));
         assertEquals(updateCorrectUser.getName(), userServiceImpl.getUser(checkCorrectUser.getId()).getName());
     }
 
     @Test
     void updateNoUser() {
         assertThrows(ContainsFalseException.class,
-                () -> userServiceImpl.updateUser(checkCorrectUser.getId(), updateCorrectUser));
+                () -> userServiceImpl.updateUser(checkCorrectUser.getId(), UserMapper.fromUserDto(updateCorrectUser, checkCorrectUser.getId())));
     }
 
     @Test
