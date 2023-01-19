@@ -1,7 +1,9 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.service;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.repository.BookingStorage;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.utils.exception.ContainsFalseException;
 
 import java.util.List;

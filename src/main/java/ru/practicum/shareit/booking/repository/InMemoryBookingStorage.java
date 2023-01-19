@@ -1,53 +1,51 @@
-package ru.practicum.shareit.request;
+package ru.practicum.shareit.booking.repository;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.utils.GeneratorId;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 @Qualifier("inMemory")
-public class InMemoryItemRequestStorage implements ItemRequestStorage {
-    private final Map<Integer, ItemRequest> bookings;
+public class InMemoryBookingStorage implements BookingStorage {
+    private final Map<Integer, Booking> bookings;
     private final GeneratorId generatorId;
 
-    public InMemoryItemRequestStorage(GeneratorId generatorId) {
+    public InMemoryBookingStorage(GeneratorId generatorId) {
         this.bookings = new HashMap<>();
         this.generatorId = generatorId;
     }
 
     @Override
-    public ItemRequest add(ItemRequest booking) {
-        ItemRequest creatingBooking = booking.toBuilder().id(generatorId.getId()).build();
+    public Booking add(Booking booking) {
+        Booking creatingBooking = booking.toBuilder().id(generatorId.getId()).build();
         return bookings.put(creatingBooking.getId(), creatingBooking);
     }
 
     @Override
-    public ItemRequest remove(ItemRequest user) {
+    public Booking remove(Booking user) {
         return bookings.remove(user.getId());
     }
 
     @Override
-    public ItemRequest remove(int userId) {
+    public Booking remove(int userId) {
         return bookings.remove(userId);
     }
 
     @Override
-    public ItemRequest update(ItemRequest user) {
+    public Booking update(Booking user) {
         return bookings.put(user.getId(), user);
     }
 
     @Override
-    public List<ItemRequest> getAll() {
+    public List<Booking> getAll() {
         return new ArrayList<>(bookings.values());
     }
 
     @Override
-    public ItemRequest get(int idUser) {
+    public Booking get(int idUser) {
         return bookings.get(idUser);
     }
 

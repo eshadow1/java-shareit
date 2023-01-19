@@ -1,5 +1,7 @@
-package ru.practicum.shareit.request;
+package ru.practicum.shareit.request.repository;
 
+
+import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.util.List;
 

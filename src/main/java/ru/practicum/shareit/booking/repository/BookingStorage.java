@@ -1,4 +1,6 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.repository;
+
+import ru.practicum.shareit.booking.model.Booking;
 
 import java.util.List;
 
