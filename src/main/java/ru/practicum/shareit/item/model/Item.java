@@ -1,11 +1,10 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
-import ru.practicum.shareit.request.model.ItemRequest;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 
 /**
  * TODO Sprint add-controllers.
@@ -14,21 +13,29 @@ import javax.validation.constraints.Positive;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
+@Entity
+@Table(name = "items", schema = "public")
 public class Item {
     @NotNull
-    @Positive
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @NotBlank
+    @Column(nullable = false)
     private String name;
 
     @NotBlank
+    @Column(nullable = false)
     private String description;
 
     @NotNull
-    private Boolean available;
+    @Column(nullable = false)
+    private Boolean isAvailable;
 
-    private int owner;
+    @Column(name = "owner_id")
+    private Integer owner;
 
-    private ItemRequest request;
+    @Column(name = "request_id")
+    private Integer request;
 }

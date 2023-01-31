@@ -19,21 +19,21 @@ class InMemoryItemStorageTest {
         correctItem = Item.builder()
                 .name("Test")
                 .description("Test")
-                .available(true)
+                .isAvailable(true)
                 .owner(1)
                 .build();
         updateCorrectItem = Item.builder()
                 .id(1)
                 .name("Test")
                 .description("Test des")
-                .available(true)
+                .isAvailable(true)
                 .owner(1)
                 .build();
         checkCorrectItem = Item.builder()
                 .id(1)
                 .name("Test")
                 .description("Test")
-                .available(true)
+                .isAvailable(true)
                 .owner(1)
                 .build();
     }
@@ -86,7 +86,7 @@ class InMemoryItemStorageTest {
         assertEquals(checkCorrectItem.getId(), itemStorage.get(checkCorrectItem.getId()).getId());
         assertEquals(checkCorrectItem.getName(), itemStorage.get(checkCorrectItem.getId()).getName());
         assertEquals(checkCorrectItem.getDescription(), itemStorage.get(checkCorrectItem.getId()).getDescription());
-        assertEquals(checkCorrectItem.getAvailable(), itemStorage.get(checkCorrectItem.getId()).getAvailable());
+        assertEquals(checkCorrectItem.getIsAvailable(), itemStorage.get(checkCorrectItem.getId()).getIsAvailable());
     }
 
     @Test

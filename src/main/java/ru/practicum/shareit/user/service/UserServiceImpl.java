@@ -13,13 +13,11 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     private final UserStorage userStorage;
 
-    public UserServiceImpl(@Qualifier("inMemory") UserStorage userStorage) {
+    public UserServiceImpl(@Qualifier("inDb") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
     public User addUser(User user) {
-        checkedUserContainsByEmail(user.getEmail());
-
         return userStorage.add(user);
     }
 

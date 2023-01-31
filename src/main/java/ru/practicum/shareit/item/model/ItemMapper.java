@@ -6,7 +6,7 @@ public final class ItemMapper {
     public static Item fromItemDto(final ItemDto itemDto, final int userId) {
         return Item.builder()
                 .description(itemDto.getDescription())
-                .available(itemDto.getAvailable())
+                .isAvailable(itemDto.getAvailable())
                 .name(itemDto.getName())
                 .owner(userId)
                 .build();
@@ -17,9 +17,9 @@ public final class ItemMapper {
                 .id(item.getId())
                 .name(item.getName())
                 .description(item.getDescription())
-                .available(item.getAvailable())
-                .owner(item.getOwner())
-                .request(item.getRequest() != null ? item.getRequest().getId() : null)
+                .available(item.getIsAvailable())
+                .ownerId(item.getOwner())
+                .requestId(item.getRequest())
                 .build();
     }
 
@@ -34,8 +34,8 @@ public final class ItemMapper {
             bufItem.description(newItem.getDescription());
         }
 
-        if (newItem.getAvailable() != null) {
-            bufItem.available(newItem.getAvailable());
+        if (newItem.getIsAvailable() != null) {
+            bufItem.isAvailable(newItem.getIsAvailable());
         }
 
         return bufItem.build();

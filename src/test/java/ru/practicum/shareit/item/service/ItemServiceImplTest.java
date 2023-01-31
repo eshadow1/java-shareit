@@ -39,20 +39,20 @@ class ItemServiceImplTest {
         correctItem = Item.builder()
                 .name("Test")
                 .description("Test")
-                .available(true)
+                .isAvailable(true)
                 .owner(1)
                 .build();
         noCorrectItem = Item.builder()
                 .name("Test")
                 .description("Test")
-                .available(true)
+                .isAvailable(true)
                 .owner(10)
                 .build();
         updateCorrectItem = Item.builder()
                 .id(1)
                 .name("Test")
                 .description("Test des")
-                .available(true)
+                .isAvailable(true)
                 .owner(1)
                 .build();
 
@@ -60,7 +60,7 @@ class ItemServiceImplTest {
                 .id(1)
                 .name("Test")
                 .description("Test")
-                .available(true)
+                .isAvailable(true)
                 .owner(1)
                 .build();
     }
@@ -93,7 +93,7 @@ class ItemServiceImplTest {
                 .id(1)
                 .name("Test")
                 .description("Test des")
-                .available(true)
+                .isAvailable(true)
                 .owner(2)
                 .build();
 

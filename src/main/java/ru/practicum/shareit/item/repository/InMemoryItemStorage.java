@@ -76,7 +76,7 @@ public class InMemoryItemStorage implements ItemStorage {
         final var tempText = text.toLowerCase(russianLocal);
         return items.values()
                 .stream()
-                .filter(Item::getAvailable)
+                .filter(Item::getIsAvailable)
                 .filter(item -> item.getDescription().toLowerCase(russianLocal).contains(tempText)
                         || item.getName().toLowerCase(russianLocal).contains(tempText))
                 .collect(Collectors.toList());

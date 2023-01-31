@@ -16,8 +16,8 @@ public class ItemServiceImpl implements ItemService {
     private final ItemStorage itemStorage;
     private final UserStorage userStorage;
 
-    public ItemServiceImpl(@Qualifier("inMemory") ItemStorage itemStorage,
-                           @Qualifier("inMemory") UserStorage userStorage) {
+    public ItemServiceImpl(@Qualifier("inDb") ItemStorage itemStorage,
+                           @Qualifier("inDb") UserStorage userStorage) {
         this.itemStorage = itemStorage;
         this.userStorage = userStorage;
     }
