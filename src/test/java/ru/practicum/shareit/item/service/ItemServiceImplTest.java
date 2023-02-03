@@ -2,7 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.model.item.Item;
 import ru.practicum.shareit.item.repository.InMemoryItemStorage;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.InMemoryUserStorage;

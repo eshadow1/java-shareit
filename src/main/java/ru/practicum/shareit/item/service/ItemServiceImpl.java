@@ -2,10 +2,12 @@ package ru.practicum.shareit.item.service;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.model.ItemMapper;
+import ru.practicum.shareit.item.model.comment.Comment;
+import ru.practicum.shareit.item.model.item.Item;
+import ru.practicum.shareit.item.model.item.ItemMapper;
 import ru.practicum.shareit.item.repository.ItemStorage;
 import ru.practicum.shareit.user.repository.UserStorage;
+import ru.practicum.shareit.utils.exception.AddFalseException;
 import ru.practicum.shareit.utils.exception.ContainsFalseException;
 import ru.practicum.shareit.utils.exception.UserNotFoundException;
 
@@ -61,6 +63,21 @@ public class ItemServiceImpl implements ItemService {
         checkedUserContains(userId);
 
         return itemStorage.searchItems(text);
+    }
+
+    @Override
+    public Comment addComment(Comment comment) {
+        checkedUserContains(comment.getAuthorId());
+        checkedItemContains(comment.getItemId());
+        var addComment = itemStorage.addComment(comment);
+        checkedAddComment(addComment, comment.getItemId());
+        return addComment.toBuilder().authorName(userStorage.get(comment.getAuthorId()).getName()).build();
+    }
+
+    private void checkedAddComment(Comment addComment, int itemId) {
+        if (addComment == null) {
+            throw new AddFalseException("Коментарий к вещи id " + itemId + " не добавлен");
+        }
     }
 
     private void checkedItemContains(int id) {

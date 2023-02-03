@@ -2,7 +2,7 @@ package ru.practicum.shareit.item.repository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.model.item.Item;
 import ru.practicum.shareit.utils.GeneratorId;
 
 import static org.junit.jupiter.api.Assertions.*;

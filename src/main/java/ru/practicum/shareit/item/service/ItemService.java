@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.model.comment.Comment;
+import ru.practicum.shareit.item.model.item.Item;
 
 import java.util.List;
 
@@ -16,4 +17,6 @@ public interface ItemService {
     Item removeItem(int userId);
 
     List<Item> searchItems(int userId, String text);
+
+    Comment addComment(Comment comment);
 }

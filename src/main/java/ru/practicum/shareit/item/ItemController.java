@@ -3,8 +3,10 @@ package ru.practicum.shareit.item;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.ItemMapper;
+import ru.practicum.shareit.item.dto.comment.CommentDto;
+import ru.practicum.shareit.item.dto.item.ItemDto;
+import ru.practicum.shareit.item.model.comment.CommentMapper;
+import ru.practicum.shareit.item.model.item.ItemMapper;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
@@ -35,6 +37,15 @@ public class ItemController {
         return ItemMapper.toItemDto(itemService.addItem(ItemMapper.fromItemDto(itemDto, userId)));
     }
 
+    @PostMapping("/{id}/comment")
+    public CommentDto addItem(@RequestHeader(name = "X-Sharer-User-Id") int userId,
+                              @PathVariable int id,
+                              @Valid @RequestBody CommentDto comment) {
+        log.info("Получен запрос на добавление коментария к предмету: " + id);
+
+        return CommentMapper.toCommentDto(itemService.addComment(CommentMapper.fromCommentDto(comment, userId, id)));
+    }
+
     @PatchMapping("/{id}")
     public ItemDto updateItem(@RequestHeader(value = "X-Sharer-User-Id") int userId,
                               @PathVariable int id, @RequestBody ItemDto itemDto) {
@@ -44,10 +55,15 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
-    public ItemDto getItem(@PathVariable int id) {
+    public ItemDto getItem(@RequestHeader(value = "X-Sharer-User-Id") int userId, @PathVariable int id) {
         log.info("Получен запрос на получение предмета " + id);
 
-        return ItemMapper.toItemDto(itemService.getItem(id));
+        ItemDto itemDto = ItemMapper.toItemDto(itemService.getItem(id));
+        if (itemDto.getOwnerId() != userId) {
+            return itemDto.toBuilder().lastBooking(null).nextBooking(null).build();
+        }
+
+        return itemDto;
     }
 
     @GetMapping

@@ -1,10 +1,8 @@
 package ru.practicum.shareit.booking.model;
 
 import lombok.*;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.model.Status;
-import ru.practicum.shareit.user.model.User;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
@@ -16,17 +14,26 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
+@Entity
+@Table(name = "bookings", schema = "public")
 public class Booking {
     @NotNull
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column(name = "start_date")
     private LocalDateTime start;
 
+    @Column(name = "end_date")
     private LocalDateTime end;
 
-    private Item item;
+    @Column(name = "item_id")
+    private Integer itemId;
 
-    private User booker;
+    @Column(name = "booker_id")
+    private Integer bookerId;
 
+    @Enumerated(value = EnumType.STRING)
     private Status status;
 }

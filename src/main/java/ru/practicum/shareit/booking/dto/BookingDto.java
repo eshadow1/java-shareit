@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.item.model.Status;
+import ru.practicum.shareit.booking.model.Status;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.FutureOrPresent;
 import java.time.LocalDateTime;
 
 /**
@@ -18,16 +18,17 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class BookingDto {
-        @NotNull
-        private int id;
+    private int id;
 
-        private LocalDateTime start;
+    @FutureOrPresent
+    private LocalDateTime start;
 
-        private LocalDateTime end;
+    @FutureOrPresent
+    private LocalDateTime end;
 
-        private Integer itemId;
+    private Integer itemId;
 
-        private Integer bookerId;
+    private Integer bookerId;
 
-        private Status status;
-    }
+    private Status status;
+}

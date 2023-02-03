@@ -46,11 +46,11 @@ public class InDbUserStorage implements UserStorage {
 
     @Override
     public User update(User user) {
-        if(user.getEmail() != null && user.getName() != null){
+        if (user.getEmail() != null && user.getName() != null) {
             userRepository.updateNameAndEmail(user.getId(), user.getName(), user.getEmail());
-        } else if(user.getEmail() != null) {
+        } else if (user.getEmail() != null) {
             userRepository.updateEmail(user.getId(), user.getEmail());
-        } else if(user.getName() != null) {
+        } else if (user.getName() != null) {
             userRepository.updateName(user.getId(), user.getName());
         }
 

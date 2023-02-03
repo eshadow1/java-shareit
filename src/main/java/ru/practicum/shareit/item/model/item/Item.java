@@ -1,14 +1,18 @@
-package ru.practicum.shareit.item.model;
+package ru.practicum.shareit.item.model.item;
 
 import lombok.*;
+import ru.practicum.shareit.booking.dto.BookingItemDao;
+import ru.practicum.shareit.item.model.comment.Comment;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * TODO Sprint add-controllers.
  */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -38,4 +42,13 @@ public class Item {
 
     @Column(name = "request_id")
     private Integer request;
+
+    @Transient
+    private BookingItemDao lastBooking;
+
+    @Transient
+    private BookingItemDao nextBooking;
+
+    @Transient
+    private List<Comment> comments;
 }

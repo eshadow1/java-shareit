@@ -1,49 +1,22 @@
 package ru.practicum.shareit.booking.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.repository.BookingStorage;
+import ru.practicum.shareit.booking.dto.BookingDao;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.utils.exception.ContainsFalseException;
+import ru.practicum.shareit.booking.model.State;
 
 import java.util.List;
 
-@Service
-public class BookingService {
+public interface BookingService {
+    BookingDao addBooking(Booking booking);
 
-    private final BookingStorage bookingStorage;
-
-    public BookingService(@Qualifier("inMemory") BookingStorage bookingStorage) {
-        this.bookingStorage = bookingStorage;
-    }
-
-    public Booking addBooking(Booking booking) {
-        return bookingStorage.add(booking);
-    }
-
-    public Booking updateBooking(int id, Booking booking) {
-        checkedBookingContains(id);
-        return bookingStorage.update(booking);
-    }
+    BookingDao updateBooking(int id, int userId, boolean approved);
 
 
-    public Booking getBooking(int bookingId) {
-        checkedBookingContains(bookingId);
+    BookingDao getBooking(int bookingId, int userId);
 
-        return bookingStorage.get(bookingId);
-    }
+    List<BookingDao> getAllBookingUser(int userId, State state);
 
-    public List<Booking> getAllBooking() {
-        return bookingStorage.getAll();
-    }
+    List<BookingDao> getAllBookingOwner(int userId, State state);
 
-    public Booking removeBooking(int bookingId) {
-        return bookingStorage.remove(bookingId);
-    }
-
-    private void checkedBookingContains(int id) {
-        if (!bookingStorage.contains(id)) {
-            throw new ContainsFalseException("Заказ с id " + id + " не найден");
-        }
-    }
+    BookingDao removeBooking(int bookingId);
 }

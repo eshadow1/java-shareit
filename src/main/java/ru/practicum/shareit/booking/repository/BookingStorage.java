@@ -1,21 +1,27 @@
 package ru.practicum.shareit.booking.repository;
 
+import ru.practicum.shareit.booking.dto.BookingDao;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.item.model.item.Item;
 
 import java.util.List;
 
 public interface BookingStorage {
-    List<Booking> getAll();
+    List<BookingDao> getAll();
 
-    Booking get(int userId);
+    BookingDao get(int bookingId);
 
-    Booking add(Booking user);
+    BookingDao add(Booking booking);
 
-    Booking remove(Booking user);
+    BookingDao remove(Booking booking);
 
-    Booking remove(int userId);
+    BookingDao remove(int bookingId);
 
-    Booking update(Booking user);
+    BookingDao update(Booking booking);
 
-    boolean contains(int userId);
+    boolean contains(int bookingId);
+
+    List<BookingDao> getAllByUser(int userId);
+
+    List<BookingDao> getAllByItems(List<Item> items);
 }

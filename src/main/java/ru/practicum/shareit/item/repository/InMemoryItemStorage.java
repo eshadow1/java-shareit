@@ -2,7 +2,8 @@ package ru.practicum.shareit.item.repository;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.model.comment.Comment;
+import ru.practicum.shareit.item.model.item.Item;
 import ru.practicum.shareit.utils.GeneratorId;
 
 import java.util.*;
@@ -53,8 +54,10 @@ public class InMemoryItemStorage implements ItemStorage {
 
     @Override
     public List<Item> getAllByUser(int userId) {
-        if (!itemsByUser.containsKey(userId))
+        if (!itemsByUser.containsKey(userId)) {
             return Collections.emptyList();
+        }
+
         return itemsByUser.get(userId).stream()
                 .map(items::get)
                 .collect(Collectors.toList());
@@ -80,5 +83,10 @@ public class InMemoryItemStorage implements ItemStorage {
                 .filter(item -> item.getDescription().toLowerCase(russianLocal).contains(tempText)
                         || item.getName().toLowerCase(russianLocal).contains(tempText))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Comment addComment(Comment comment) {
+        return null;
     }
 }

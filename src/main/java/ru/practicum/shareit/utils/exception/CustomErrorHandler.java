@@ -35,4 +35,41 @@ public class CustomErrorHandler {
     public Map<String, String> handleUserNotFoundException(final UserNotFoundException error) {
         return Map.of("error", HttpStatus.NOT_FOUND + ": " + error.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleNotOwnerException(final NotOwnerException error) {
+        return Map.of("error", error.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleAvailableFalseException(final AvailableFalseException error) {
+        return Map.of("error", HttpStatus.BAD_REQUEST + ": " + error.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleTimeFalseException(final TimeFalseException error) {
+        return Map.of("error", HttpStatus.BAD_REQUEST + ": " + error.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleIllegalStateException(final IllegalStateException error) {
+        return Map.of("error", error.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleUpdateFalseException(final UpdateFalseException error) {
+        return Map.of("error", error.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleAddFalseException(final AddFalseException error) {
+        return Map.of("error", HttpStatus.BAD_REQUEST + ": " + error.getMessage());
+    }
+
 }
