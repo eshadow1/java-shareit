@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.model.item;
 import lombok.*;
 import ru.practicum.shareit.booking.dto.BookingItemDao;
 import ru.practicum.shareit.item.model.comment.Comment;
+import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -37,8 +38,12 @@ public class Item {
     @Column(nullable = false)
     private Boolean isAvailable;
 
-    @Column(name = "owner_id")
-    private Integer owner;
+    //@Column(name = "owner_id")
+    //private Integer owner;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade=CascadeType.ALL)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
 
     @Column(name = "request_id")
     private Integer request;

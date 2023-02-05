@@ -5,9 +5,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.dto.BookingItemDao;
 import ru.practicum.shareit.item.model.item.Item;
+import ru.practicum.shareit.user.model.User;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 public interface ItemRepository extends JpaRepository<Item, Integer> {
     @Query("SELECT i " +
@@ -16,7 +18,7 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
             "ORDER BY i.id")
     List<Item> searchItemsBy(String tempText);
 
-    List<Item> findByOwnerOrderByIdAsc(int userId);
+    List<Item> findByOwnerOrderByIdAsc(User user);
 
     List<Item> findByIdAndOwnerOrderByIdAsc(int itemId, int userId);
 
@@ -51,5 +53,8 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
             "ORDER BY b.start ASC")
     List<BookingItemDao> findAllFutureBookingByItemId(int itemId);
 
-
+    @Query("SELECT u " +
+            "FROM User AS u " +
+            "WHERE u.id = ?1 ")
+    Optional<User> getUser(int userId);
 }

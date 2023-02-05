@@ -8,6 +8,7 @@ import ru.practicum.shareit.item.dto.item.ItemDto;
 import ru.practicum.shareit.item.model.comment.CommentMapper;
 import ru.practicum.shareit.item.model.item.ItemMapper;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
 import java.util.Collections;
@@ -23,9 +24,12 @@ import java.util.stream.Collectors;
 @RequestMapping("/items")
 public class ItemController {
     private final ItemService itemService;
+    private final UserService userService;
 
-    public ItemController(ItemService itemService) {
+    public ItemController(ItemService itemService,
+                          UserService userService) {
         this.itemService = itemService;
+        this.userService = userService;
     }
 
     @PostMapping
@@ -34,7 +38,7 @@ public class ItemController {
                            @Valid @RequestBody ItemDto itemDto) {
         log.info("Получен запрос на добавление предмета: " + itemDto);
 
-        return ItemMapper.toItemDto(itemService.addItem(ItemMapper.fromItemDto(itemDto, userId)));
+        return ItemMapper.toItemDto(itemService.addItem(ItemMapper.fromItemDto(itemDto, userService.getUser(userId))));
     }
 
     @PostMapping("/{id}/comment")
@@ -51,7 +55,7 @@ public class ItemController {
                               @PathVariable int id, @RequestBody ItemDto itemDto) {
         log.info("Получен запрос на обновление предмета " + id + ": " + itemDto);
 
-        return ItemMapper.toItemDto(itemService.updateItem(id, ItemMapper.fromItemDto(itemDto, userId)));
+        return ItemMapper.toItemDto(itemService.updateItem(id, ItemMapper.fromItemDto(itemDto, userService.getUser(userId))));
     }
 
     @GetMapping("/{id}")

@@ -27,7 +27,7 @@ public class InMemoryItemStorage implements ItemStorage {
         Item creatingUser = item.toBuilder().id(generatorId.getId()).build();
         items.put(creatingUser.getId(), creatingUser);
         if (!itemsByUser.containsKey(creatingUser.getOwner())) {
-            itemsByUser.put(creatingUser.getOwner(), new HashSet<>());
+            itemsByUser.put(creatingUser.getOwner().getId(), new HashSet<>());
         }
         itemsByUser.get(creatingUser.getOwner()).add(creatingUser.getId());
         return creatingUser;

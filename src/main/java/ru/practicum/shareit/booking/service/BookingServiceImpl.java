@@ -38,7 +38,7 @@ public class BookingServiceImpl implements BookingService {
         checkedUserContains(booking.getBookerId());
         checkedTimeBooking(booking);
         var item = itemStorage.get(booking.getItemId());
-        checkedBookerEqualsOwner(booking.getBookerId(), item.getOwner());
+        checkedBookerEqualsOwner(booking.getBookerId(), item.getOwner().getId());
 
         booking.setStatus(Status.WAITING);
         return bookingStorage.add(booking);
@@ -123,7 +123,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private void checkedItemBookingByUser(Item item, Integer userId) {
-        if (!Objects.equals(item.getOwner(), userId)) {
+        if (!Objects.equals(item.getOwner().getId(), userId)) {
             throw new NotOwnerException("Предмет с id " + item.getId() + " не принадлежит пользователю " + userId);
         }
     }
@@ -135,7 +135,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private void checkedBookingContainsUsers(int userId, BookingDao booking, Item item) {
-        if (booking.getBooker().getId() != userId && item.getOwner() != userId) {
+        if (booking.getBooker().getId() != userId && item.getOwner().getId() != userId) {
             throw new ContainsFalseException("Заказ с id " + booking.getId() + " не связан с пользователями");
         }
     }

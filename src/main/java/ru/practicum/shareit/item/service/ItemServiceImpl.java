@@ -26,17 +26,17 @@ public class ItemServiceImpl implements ItemService {
     }
 
     public Item addItem(Item item) {
-        checkedUserContains(item.getOwner());
+        checkedUserContains(item.getOwner().getId());
 
         return itemStorage.add(item);
     }
 
     public Item updateItem(int id, Item item) {
         checkedItemContains(id);
-        checkedUserContains(item.getOwner());
+        checkedUserContains(item.getOwner().getId());
 
         var oldItem = itemStorage.get(id);
-        checkedItemForUser(oldItem.getOwner(), item.getOwner());
+        checkedItemForUser(oldItem.getOwner().getId(), item.getOwner().getId());
 
         oldItem = ItemMapper.update(oldItem, item);
         itemStorage.update(oldItem);

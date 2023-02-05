@@ -27,7 +27,10 @@ public class InDbItemStorage implements ItemStorage {
 
     @Override
     public List<Item> getAllByUser(int userId) {
-        return itemRepository.findByOwnerOrderByIdAsc(userId).stream()
+        var user = itemRepository.getUser(userId);
+        if (user.isEmpty())
+            return null;
+        return itemRepository.findByOwnerOrderByIdAsc(user.get()).stream()
                 .map(item -> {
                     var lastAll = itemRepository.findAllLastBookingByItemId(item.getId());
                     BookingItemDao last = lastAll.isEmpty() ? null : lastAll.get(0);

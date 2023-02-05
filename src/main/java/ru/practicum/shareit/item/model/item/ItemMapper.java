@@ -1,14 +1,15 @@
 package ru.practicum.shareit.item.model.item;
 
 import ru.practicum.shareit.item.dto.item.ItemDto;
+import ru.practicum.shareit.user.model.User;
 
 public final class ItemMapper {
-    public static Item fromItemDto(final ItemDto itemDto, final int userId) {
+    public static Item fromItemDto(final ItemDto itemDto, final User user) {
         return Item.builder()
                 .description(itemDto.getDescription())
                 .isAvailable(itemDto.getAvailable())
                 .name(itemDto.getName())
-                .owner(userId)
+                .owner(user)
                 .build();
     }
 
@@ -18,7 +19,7 @@ public final class ItemMapper {
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getIsAvailable())
-                .ownerId(item.getOwner())
+                .ownerId(item.getOwner().getId())
                 .requestId(item.getRequest())
                 .lastBooking(item.getLastBooking())
                 .nextBooking(item.getNextBooking())
