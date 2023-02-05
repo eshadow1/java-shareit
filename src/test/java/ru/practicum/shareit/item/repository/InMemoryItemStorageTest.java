@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.repository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.item.model.item.Item;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.utils.GeneratorId;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,25 +17,32 @@ class InMemoryItemStorageTest {
     @BeforeEach
     public void beforeEach() {
         itemStorage = new InMemoryItemStorage(new GeneratorId());
+
+        User userId1 = User.builder()
+                .id(1)
+                .name("Test")
+                .email("test@test.com")
+                .build();
+
         correctItem = Item.builder()
                 .name("Test")
                 .description("Test")
                 .isAvailable(true)
-                .owner(1)
+                .owner(userId1)
                 .build();
         updateCorrectItem = Item.builder()
                 .id(1)
                 .name("Test")
                 .description("Test des")
                 .isAvailable(true)
-                .owner(1)
+                .owner(userId1)
                 .build();
         checkCorrectItem = Item.builder()
                 .id(1)
                 .name("Test")
                 .description("Test")
                 .isAvailable(true)
-                .owner(1)
+                .owner(userId1)
                 .build();
     }
 
@@ -69,7 +77,7 @@ class InMemoryItemStorageTest {
     void getAllByUser() {
         itemStorage.add(correctItem);
         int size = 1;
-        assertEquals(size, itemStorage.getAllByUser(checkCorrectItem.getOwner()).size());
+        assertEquals(size, itemStorage.getAllByUser(checkCorrectItem.getOwner().getId()).size());
     }
 
     @Test

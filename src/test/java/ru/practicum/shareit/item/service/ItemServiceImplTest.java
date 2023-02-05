@@ -36,24 +36,36 @@ class ItemServiceImplTest {
         itemService = new ItemServiceImpl(new InMemoryItemStorage(new GeneratorId()),
                 userStorage);
 
+        User userId1 = User.builder()
+                .id(1)
+                .name("Test")
+                .email("test@test.com")
+                .build();
+
+        User userId10 = User.builder()
+                .id(10)
+                .name("Test10")
+                .email("email10@email.com")
+                .build();
+
         correctItem = Item.builder()
                 .name("Test")
                 .description("Test")
                 .isAvailable(true)
-                .owner(1)
+                .owner(userId1)
                 .build();
         noCorrectItem = Item.builder()
                 .name("Test")
                 .description("Test")
                 .isAvailable(true)
-                .owner(10)
+                .owner(userId10)
                 .build();
         updateCorrectItem = Item.builder()
                 .id(1)
                 .name("Test")
                 .description("Test des")
                 .isAvailable(true)
-                .owner(1)
+                .owner(userId1)
                 .build();
 
         checkCorrectItem = Item.builder()
@@ -61,7 +73,7 @@ class ItemServiceImplTest {
                 .name("Test")
                 .description("Test")
                 .isAvailable(true)
-                .owner(1)
+                .owner(userId1)
                 .build();
     }
 
@@ -89,12 +101,18 @@ class ItemServiceImplTest {
     @Test
     void updateIncorrectItem() {
         itemService.addItem(correctItem);
+        User userId2 = User.builder()
+                .id(2)
+                .name("test2")
+                .email("test2@test.com")
+                .build();
+
         var updateIncorrectItem = Item.builder()
                 .id(1)
                 .name("Test")
                 .description("Test des")
                 .isAvailable(true)
-                .owner(2)
+                .owner(userId2)
                 .build();
 
         assertThrows(ContainsFalseException.class,
@@ -119,7 +137,7 @@ class ItemServiceImplTest {
     void getAllItemsByUser() {
         itemService.addItem(correctItem);
         int size = 1;
-        assertEquals(size, itemService.getAllItemsByUser(correctItem.getOwner()).size());
+        assertEquals(size, itemService.getAllItemsByUser(correctItem.getOwner().getId()).size());
     }
 
     @Test
@@ -141,13 +159,13 @@ class ItemServiceImplTest {
     void searchItems() {
         itemService.addItem(correctItem);
         int size = 1;
-        assertEquals(size, itemService.searchItems(correctItem.getOwner(), "test").size());
+        assertEquals(size, itemService.searchItems(correctItem.getOwner().getId(), "test").size());
     }
 
     @Test
     void searchNoItems() {
         itemService.addItem(correctItem);
         int size = 0;
-        assertEquals(size, itemService.searchItems(correctItem.getOwner(), "asd").size());
+        assertEquals(size, itemService.searchItems(correctItem.getOwner().getId(), "asd").size());
     }
 }

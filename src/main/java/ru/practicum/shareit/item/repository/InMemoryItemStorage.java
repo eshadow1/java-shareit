@@ -26,23 +26,23 @@ public class InMemoryItemStorage implements ItemStorage {
     public Item add(Item item) {
         Item creatingUser = item.toBuilder().id(generatorId.getId()).build();
         items.put(creatingUser.getId(), creatingUser);
-        if (!itemsByUser.containsKey(creatingUser.getOwner())) {
+        if (!itemsByUser.containsKey(creatingUser.getOwner().getId())) {
             itemsByUser.put(creatingUser.getOwner().getId(), new HashSet<>());
         }
-        itemsByUser.get(creatingUser.getOwner()).add(creatingUser.getId());
+        itemsByUser.get(creatingUser.getOwner().getId()).add(creatingUser.getId());
         return creatingUser;
     }
 
     @Override
     public Item remove(Item item) {
-        itemsByUser.get(item.getOwner()).remove(item.getId());
+        itemsByUser.get(item.getOwner().getId()).remove(item.getId());
         return items.remove(item.getId());
     }
 
     @Override
     public Item remove(int itemId) {
         if (items.containsKey(itemId)) {
-            itemsByUser.get(items.get(itemId).getOwner()).remove(itemId);
+            itemsByUser.get(items.get(itemId).getOwner().getId()).remove(itemId);
         }
         return items.remove(itemId);
     }
