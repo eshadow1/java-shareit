@@ -13,10 +13,8 @@ import ru.practicum.shareit.item.repository.ItemStorage;
 import ru.practicum.shareit.user.repository.UserStorage;
 import ru.practicum.shareit.utils.exception.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -79,14 +77,14 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDao> getAllBookingUser(int userId, State state) {
         checkedUserContains(userId);
-        return getCurrentBooking(bookingStorage.getAllByUser(userId), state);
+        return bookingStorage.getAllByUserAndState(userId, state);
     }
 
     @Override
     public List<BookingDao> getAllBookingOwner(int userId, State state) {
         checkedUserContains(userId);
         var items = itemStorage.getAllByUser(userId);
-        return getCurrentBooking(bookingStorage.getAllByItems(items), state);
+        return bookingStorage.getAllByItems(items, state);
     }
 
     @Override
@@ -145,36 +143,6 @@ public class BookingServiceImpl implements BookingService {
     private void checkedBookerEqualsOwner(Integer bookerId, Integer owner) {
         if (bookerId.equals(owner)) {
             throw new ContainsFalseException("У заказа одинаковый пользователь и заказчик");
-        }
-    }
-
-    private List<BookingDao> getCurrentBooking(List<BookingDao> allBooking, State state) {
-        switch (state) {
-            case ALL:
-                return allBooking;
-            case WAITING:
-                return allBooking.stream()
-                        .filter(booking -> Status.WAITING.equals(booking.getStatus()))
-                        .collect(Collectors.toList());
-            case REJECTED:
-                return allBooking.stream()
-                        .filter(booking -> Status.REJECTED.equals(booking.getStatus()))
-                        .collect(Collectors.toList());
-            case PAST:
-                return allBooking.stream()
-                        .filter(booking -> LocalDateTime.now().isAfter(booking.getEnd()))
-                        .collect(Collectors.toList());
-            case FUTURE:
-                return allBooking.stream()
-                        .filter(booking -> LocalDateTime.now().isBefore(booking.getStart()))
-                        .collect(Collectors.toList());
-            case CURRENT:
-                return allBooking.stream()
-                        .filter(booking -> LocalDateTime.now().isAfter(booking.getStart()))
-                        .filter(booking -> LocalDateTime.now().isBefore(booking.getEnd()))
-                        .collect(Collectors.toList());
-            default:
-                throw new IllegalStateException("Unknown state: " + state);
         }
     }
 }

@@ -86,7 +86,7 @@ public class InMemoryItemStorage implements ItemStorage {
     }
 
     @Override
-    public Comment addComment(Comment comment) {
+    public Optional<Comment> addComment(Comment comment) {
         return null;
     }
 }

@@ -8,7 +8,6 @@ import ru.practicum.shareit.item.model.item.Item;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 
 public interface ItemRepository extends JpaRepository<Item, Integer> {
     @Query("SELECT i " +
@@ -17,17 +16,9 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
             "ORDER BY i.id")
     List<Item> searchItemsBy(String tempText);
 
-    @Query("SELECT i " +
-            "FROM Item AS i " +
-            "WHERE i.owner = ?1 " +
-            "ORDER BY i.id")
-    List<Item> findAllByOwnerId(int userId);
+    List<Item> findByOwnerOrderByIdAsc(int userId);
 
-    @Query("SELECT i " +
-            "FROM Item AS i " +
-            "WHERE i.id = ?1 AND i.owner = ?2 " +
-            "ORDER BY i.id")
-    Optional<Item> findByIdAndUserId(int itemId, int userId);
+    List<Item> findByIdAndOwnerOrderByIdAsc(int itemId, int userId);
 
     @Transactional
     @Modifying(clearAutomatically = true)

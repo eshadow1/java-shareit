@@ -6,8 +6,11 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.booking.dto.BookingDao;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingMapper;
+import ru.practicum.shareit.booking.model.State;
+import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.item.model.item.Item;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,20 +71,69 @@ public class InDbBookingStorage implements BookingStorage {
     }
 
     @Override
-    public List<BookingDao> getAllByUser(int userId) {
-        var all = bookingRepository.findByBookerId(userId);
-        return all.stream()
+    public List<BookingDao> getAllByItems(List<Item> items, State state) {
+        var allItem = items.stream()
+                .map(Item::getId)
+                .collect(Collectors.toList());
+        List<Booking> allBooking;
+        var time = LocalDateTime.now();
+        switch (state) {
+            case ALL:
+                allBooking = bookingRepository.findByItemIdInOrderByStartDesc(allItem);
+                break;
+            case WAITING:
+                allBooking = bookingRepository.findByItemIdInAndStatusOrderByStartDesc(allItem, Status.WAITING);
+                break;
+            case REJECTED:
+                allBooking = bookingRepository.findByItemIdInAndStatusOrderByStartDesc(allItem, Status.REJECTED);
+                break;
+            case PAST:
+                allBooking = bookingRepository.findByItemIdInAndEndBeforeOrderByStartDesc(allItem, time);
+                break;
+            case FUTURE:
+                allBooking = bookingRepository.findByItemIdInAndStartAfterOrderByStartDesc(allItem, time);
+                break;
+            case CURRENT:
+                allBooking = bookingRepository.findByItemIdInAndStartBeforeAndEndAfterOrderByStartDesc(allItem, time, time);
+                break;
+            default:
+                throw new IllegalStateException("Unknown state: " + state);
+        }
+        
+        return allBooking.stream()
                 .map(booking -> BookingMapper.toBookingDao(booking,
                         bookingRepository.getItem(booking.getItemId()).orElse(null)))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<BookingDao> getAllByItems(List<Item> items) {
-        var all = bookingRepository.findByItems(items.stream()
-                .map(Item::getId)
-                .collect(Collectors.toList()));
-        return all.stream()
+    public List<BookingDao> getAllByUserAndState(int userId, State state) {
+        List<Booking> allBooking;
+        switch (state) {
+            case ALL:
+                allBooking = bookingRepository.findByBookerIdOrderByStartDesc(userId);
+                break;
+            case WAITING:
+                allBooking = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING);
+                break;
+            case REJECTED:
+                allBooking = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, Status.REJECTED);
+                break;
+            case PAST:
+                allBooking = bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now());
+                break;
+            case FUTURE:
+                allBooking = bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now());
+                break;
+            case CURRENT:
+                var time = LocalDateTime.now();
+                allBooking = bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, time, time);
+                break;
+            default:
+                throw new IllegalStateException("Unknown state: " + state);
+        }
+
+        return allBooking.stream()
                 .map(booking -> BookingMapper.toBookingDao(booking,
                         bookingRepository.getItem(booking.getItemId()).orElse(null)))
                 .collect(Collectors.toList());

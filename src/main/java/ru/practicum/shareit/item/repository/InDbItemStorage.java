@@ -9,6 +9,7 @@ import ru.practicum.shareit.item.model.item.Item;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -26,7 +27,7 @@ public class InDbItemStorage implements ItemStorage {
 
     @Override
     public List<Item> getAllByUser(int userId) {
-        return itemRepository.findAllByOwnerId(userId).stream()
+        return itemRepository.findByOwnerOrderByIdAsc(userId).stream()
                 .map(item -> {
                     var lastAll = itemRepository.findAllLastBookingByItemId(item.getId());
                     BookingItemDao last = lastAll.isEmpty() ? null : lastAll.get(0);
@@ -98,11 +99,11 @@ public class InDbItemStorage implements ItemStorage {
     }
 
     @Override
-    public Comment addComment(Comment comment) {
+    public Optional<Comment> addComment(Comment comment) {
         var items = commentRepository.getBookingByItemIdAndAuthorId(comment.getItemId(), comment.getAuthorId());
         if (items.isEmpty()) {
-            return null;
+            return Optional.empty();
         }
-        return commentRepository.save(comment);
+        return Optional.of(commentRepository.save(comment));
     }
 }

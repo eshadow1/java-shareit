@@ -11,7 +11,6 @@ public interface BookingService {
 
     BookingDao updateBooking(int id, int userId, boolean approved);
 
-
     BookingDao getBooking(int bookingId, int userId);
 
     List<BookingDao> getAllBookingUser(int userId, State state);

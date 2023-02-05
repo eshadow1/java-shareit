@@ -12,6 +12,7 @@ import ru.practicum.shareit.utils.exception.ContainsFalseException;
 import ru.practicum.shareit.utils.exception.UserNotFoundException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -71,11 +72,11 @@ public class ItemServiceImpl implements ItemService {
         checkedItemContains(comment.getItemId());
         var addComment = itemStorage.addComment(comment);
         checkedAddComment(addComment, comment.getItemId());
-        return addComment.toBuilder().authorName(userStorage.get(comment.getAuthorId()).getName()).build();
+        return addComment.get().toBuilder().authorName(userStorage.get(comment.getAuthorId()).getName()).build();
     }
 
-    private void checkedAddComment(Comment addComment, int itemId) {
-        if (addComment == null) {
+    private void checkedAddComment(Optional<Comment> addComment, int itemId) {
+        if (addComment.isEmpty()) {
             throw new AddFalseException("Коментарий к вещи id " + itemId + " не добавлен");
         }
     }

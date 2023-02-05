@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.repository;
 
 import ru.practicum.shareit.booking.dto.BookingDao;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.item.model.item.Item;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public interface BookingStorage {
 
     boolean contains(int bookingId);
 
-    List<BookingDao> getAllByUser(int userId);
+    List<BookingDao> getAllByItems(List<Item> items, State state);
 
-    List<BookingDao> getAllByItems(List<Item> items);
+    List<BookingDao> getAllByUserAndState(int userId, State state);
 }

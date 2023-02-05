@@ -4,6 +4,7 @@ import ru.practicum.shareit.item.model.comment.Comment;
 import ru.practicum.shareit.item.model.item.Item;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ItemStorage {
     List<Item> getAllByUser(int userId);
@@ -22,5 +23,5 @@ public interface ItemStorage {
 
     List<Item> searchItems(String text);
 
-    Comment addComment(Comment comment);
+    Optional<Comment> addComment(Comment comment);
 }
