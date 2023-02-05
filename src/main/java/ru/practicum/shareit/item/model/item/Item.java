@@ -38,10 +38,7 @@ public class Item {
     @Column(nullable = false)
     private Boolean isAvailable;
 
-    //@Column(name = "owner_id")
-    //private Integer owner;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade=CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 

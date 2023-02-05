@@ -68,7 +68,7 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<BookingDao> getBookingsOwner(@RequestHeader(name = "X-Sharer-User-Id") int userId,
-                                        @RequestParam(defaultValue = "ALL") String state) {
+                                             @RequestParam(defaultValue = "ALL") String state) {
         log.info("Получен запрос на получение всех заказов от пользователя " + userId);
         try {
             var newState = State.valueOf(state);

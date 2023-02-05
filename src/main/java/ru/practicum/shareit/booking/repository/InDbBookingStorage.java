@@ -99,7 +99,7 @@ public class InDbBookingStorage implements BookingStorage {
             default:
                 throw new IllegalStateException("Unknown state: " + state);
         }
-        
+
         return allBooking.stream()
                 .map(booking -> BookingMapper.toBookingDao(booking,
                         bookingRepository.getItem(booking.getItemId()).orElse(null)))

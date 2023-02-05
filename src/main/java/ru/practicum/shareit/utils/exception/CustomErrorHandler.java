@@ -23,7 +23,6 @@ public class CustomErrorHandler {
         return Map.of("error", HttpStatus.NOT_FOUND + ": " + error.getMessage());
     }
 
-
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public Map<String, String> handleContainsTrueException(final ContainsTrueException error) {
