@@ -68,11 +68,11 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Comment addComment(Comment comment) {
-        checkedUserContains(comment.getAuthorId());
-        checkedItemContains(comment.getItemId());
+        checkedUserContains(comment.getAuthor().getId());
+        checkedItemContains(comment.getItem().getId());
         var addComment = itemStorage.addComment(comment);
-        checkedAddComment(addComment, comment.getItemId());
-        return addComment.get().toBuilder().authorName(userStorage.get(comment.getAuthorId()).getName()).build();
+        checkedAddComment(addComment, comment.getItem().getId());
+        return addComment.get();
     }
 
     private void checkedAddComment(Optional<Comment> addComment, int itemId) {

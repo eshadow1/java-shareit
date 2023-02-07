@@ -1,14 +1,16 @@
 package ru.practicum.shareit.item.model.comment;
 
 import ru.practicum.shareit.item.dto.comment.CommentDto;
+import ru.practicum.shareit.item.model.item.Item;
+import ru.practicum.shareit.user.model.User;
 
 public class CommentMapper {
-    public static Comment fromCommentDto(final CommentDto itemDto, final int userId, final int itemId) {
+    public static Comment fromCommentDto(final CommentDto itemDto, final User user, final Item item) {
         return Comment.builder()
                 .text(itemDto.getText())
-                .itemId(itemId)
-                .authorId(userId)
-                .authorName(itemDto.getAuthorName())
+                .item(item)
+                .author(user)
+                .authorName(user.getName())
                 .build();
     }
 
@@ -16,8 +18,8 @@ public class CommentMapper {
         return CommentDto.builder()
                 .id(item.getId())
                 .text(item.getText())
-                .itemId(item.getItemId())
-                .authorId(item.getAuthorId())
+                .itemId(item.getItem().getId())
+                .authorId(item.getAuthor().getId())
                 .authorName(item.getAuthorName())
                 .build();
     }

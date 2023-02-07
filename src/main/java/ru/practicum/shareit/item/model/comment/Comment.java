@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.item.model.item.Item;
+import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 
@@ -20,11 +22,13 @@ public class Comment {
 
     private String text;
 
-    @Column(name = "item_id")
-    private Integer itemId;
+    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.MERGE)
+    @JoinColumn(name = "item_id", nullable = false)
+    private Item item;
 
-    @Column(name = "author_id")
-    private Integer authorId;
+    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.MERGE)
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
 
     @Transient
     private String authorName;

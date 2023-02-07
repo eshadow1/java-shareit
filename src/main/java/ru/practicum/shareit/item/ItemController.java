@@ -47,7 +47,10 @@ public class ItemController {
                               @Valid @RequestBody CommentDto comment) {
         log.info("Получен запрос на добавление коментария к предмету: " + id);
 
-        return CommentMapper.toCommentDto(itemService.addComment(CommentMapper.fromCommentDto(comment, userId, id)));
+        return CommentMapper.toCommentDto(itemService.addComment(
+                CommentMapper.fromCommentDto(comment,
+                        userService.getUser(userId),
+                        itemService.getItem(id))));
     }
 
     @PatchMapping("/{id}")
@@ -61,8 +64,10 @@ public class ItemController {
     @GetMapping("/{id}")
     public ItemDto getItem(@RequestHeader(value = "X-Sharer-User-Id") int userId, @PathVariable int id) {
         log.info("Получен запрос на получение предмета " + id);
+        var item = itemService.getItem(id);
 
-        ItemDto itemDto = ItemMapper.toItemDto(itemService.getItem(id));
+        ItemDto itemDto = ItemMapper.toItemDto(item);
+
         if (itemDto.getOwnerId() != userId) {
             return itemDto.toBuilder().lastBooking(null).nextBooking(null).build();
         }

@@ -7,9 +7,7 @@ import ru.practicum.shareit.booking.dto.BookingItemDao;
 import ru.practicum.shareit.item.model.comment.Comment;
 import ru.practicum.shareit.item.model.item.Item;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -103,7 +101,7 @@ public class InDbItemStorage implements ItemStorage {
 
     @Override
     public Optional<Comment> addComment(Comment comment) {
-        var items = commentRepository.getBookingByItemIdAndAuthorId(comment.getItemId(), comment.getAuthorId());
+        var items = commentRepository.getBookingByItemIdAndAuthorId(comment.getItem().getId(), comment.getAuthor().getId());
         if (items.isEmpty()) {
             return Optional.empty();
         }

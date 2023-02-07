@@ -8,6 +8,7 @@ import ru.practicum.shareit.user.model.User;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,5 +53,5 @@ public class Item {
     private BookingItemDao nextBooking;
 
     @Transient
-    private List<Comment> comments;
+    private List<Comment> comments = new ArrayList<>();
 }

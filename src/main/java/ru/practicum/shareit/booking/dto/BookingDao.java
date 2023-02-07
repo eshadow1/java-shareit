@@ -28,7 +28,7 @@ public class BookingDao {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime end;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @CollectionTable(name = "items", joinColumns = @JoinColumn(name = "item_id"))
     @AttributeOverrides({
             @AttributeOverride(name = "id", column = @Column(name = "id")),
@@ -36,7 +36,7 @@ public class BookingDao {
     })
     private ItemDao item;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @CollectionTable(name = "users", joinColumns = @JoinColumn(name = "booker_id"))
     @AttributeOverrides({
             @AttributeOverride(name = "id", column = @Column(name = "id")),

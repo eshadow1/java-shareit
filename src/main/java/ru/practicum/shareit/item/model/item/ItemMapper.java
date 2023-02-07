@@ -1,7 +1,11 @@
 package ru.practicum.shareit.item.model.item;
 
 import ru.practicum.shareit.item.dto.item.ItemDto;
+import ru.practicum.shareit.item.model.comment.CommentMapper;
 import ru.practicum.shareit.user.model.User;
+
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 public final class ItemMapper {
     public static Item fromItemDto(final ItemDto itemDto, final User user) {
@@ -23,7 +27,11 @@ public final class ItemMapper {
                 .requestId(item.getRequest())
                 .lastBooking(item.getLastBooking())
                 .nextBooking(item.getNextBooking())
-                .comments(item.getComments())
+                .comments(item.getComments() == null ?
+                        Collections.emptyList() : item.getComments()
+                        .stream()
+                        .map(CommentMapper::toCommentDto)
+                        .collect(Collectors.toList()))
                 .build();
     }
 

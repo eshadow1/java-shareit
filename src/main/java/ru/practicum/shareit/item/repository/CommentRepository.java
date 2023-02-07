@@ -8,10 +8,10 @@ import ru.practicum.shareit.item.model.comment.Comment;
 import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Integer> {
-    @Query("SELECT new ru.practicum.shareit.item.model.comment.Comment(c.id, c.text, c.itemId, c.authorId, u.name) " +
+    @Query("SELECT new ru.practicum.shareit.item.model.comment.Comment(c.id, c.text, c.item, c.author, u.name) " +
             "FROM Comment AS c " +
-            "JOIN User As u ON c.authorId = u.id " +
-            "WHERE c.itemId = (?1) ")
+            "JOIN User As u ON c.author.id = u.id " +
+            "WHERE c.item.id = (?1) ")
     List<Comment> findAllByItemId(Integer itemId);
 
     @Query("SELECT b " +
