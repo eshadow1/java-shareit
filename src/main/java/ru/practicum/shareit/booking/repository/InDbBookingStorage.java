@@ -61,7 +61,9 @@ public class InDbBookingStorage implements BookingStorage {
 
     @Override
     public BookingDao update(Booking booking) {
-        bookingRepository.updateStatus(booking.getId(), booking.getStatus());
+        var tempBooking = bookingRepository.findById(booking.getId()).orElseThrow();
+        tempBooking.setStatus(booking.getStatus());
+        bookingRepository.save(tempBooking);
         return get(booking.getId());
     }
 

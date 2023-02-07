@@ -82,8 +82,11 @@ public class InDbItemStorage implements ItemStorage {
 
     @Override
     public Item update(Item item) {
-        itemRepository.update(item.getId(), item.getName(), item.getDescription(), item.getIsAvailable());
-        return get(item.getId());
+        var tempItem = itemRepository.findById(item.getId()).orElseThrow();
+        tempItem.setName(item.getName());
+        tempItem.setDescription(item.getDescription());
+        tempItem.setIsAvailable(item.getIsAvailable());
+        return itemRepository.save(tempItem);
     }
 
     @Override

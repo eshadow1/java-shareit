@@ -1,13 +1,11 @@
 package ru.practicum.shareit.booking.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.item.model.item.Item;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -35,9 +33,4 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     List<Booking> findByItemIdInAndEndBeforeOrderByStartDesc(List<Integer> items, LocalDateTime time);
 
     List<Booking> findByItemIdInAndStartBeforeAndEndAfterOrderByStartDesc(List<Integer> items, LocalDateTime timeAfter, LocalDateTime timeBefore);
-
-    @Transactional
-    @Modifying(clearAutomatically = true)
-    @Query(value = "UPDATE Booking b SET b.status = ?2 WHERE b.id = ?1")
-    void updateStatus(int id, Status status);
 }

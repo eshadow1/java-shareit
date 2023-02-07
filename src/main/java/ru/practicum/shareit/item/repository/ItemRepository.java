@@ -1,13 +1,11 @@
 package ru.practicum.shareit.item.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.dto.BookingItemDao;
 import ru.practicum.shareit.item.model.item.Item;
 import ru.practicum.shareit.user.model.User;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,13 +19,6 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
     List<Item> findByOwnerOrderByIdAsc(User user);
 
     List<Item> findByIdAndOwnerOrderByIdAsc(int itemId, int userId);
-
-    @Transactional
-    @Modifying(clearAutomatically = true)
-    @Query(value = "UPDATE Item i " +
-            "SET i.name = ?2, i.description = ?3, i.isAvailable = ?4 " +
-            "WHERE i.id = ?1")
-    void update(int id, String name, String description, Boolean isAvailable);
 
     @Query("SELECT new ru.practicum.shareit.booking.dto.BookingItemDao(b.id, b.bookerId) " +
             "FROM Booking AS b " +
