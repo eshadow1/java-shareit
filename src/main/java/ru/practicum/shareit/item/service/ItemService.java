@@ -19,4 +19,10 @@ public interface ItemService {
     List<Item> searchItems(int userId, String text);
 
     Comment addComment(Comment comment);
+
+    Item get(int itemId);
+
+    List<Item> getAllByUser(int userId);
+
+    boolean contains(Integer itemId);
 }

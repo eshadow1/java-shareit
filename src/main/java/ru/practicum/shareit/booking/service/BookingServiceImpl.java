@@ -1,148 +1,174 @@
 package ru.practicum.shareit.booking.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDao;
 import ru.practicum.shareit.booking.model.BookingMapper;
 import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.model.Status;
-import ru.practicum.shareit.booking.repository.BookingStorage;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.model.item.Item;
-import ru.practicum.shareit.item.repository.ItemStorage;
-import ru.practicum.shareit.user.repository.UserStorage;
-import ru.practicum.shareit.utils.exception.*;
+import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
+
 
 @Service
 public class BookingServiceImpl implements BookingService {
 
-    private final BookingStorage bookingStorage;
-    private final ItemStorage itemStorage;
-    private final UserStorage userStorage;
+    private final BookingRepository bookingRepository;
+    private final ItemService itemService;
+    private final UserRepository userRepository;
 
-    public BookingServiceImpl(@Qualifier("inDb") BookingStorage bookingStorage,
-                              @Qualifier("inDb") ItemStorage itemStorage,
-                              @Qualifier("inDb") UserStorage userStorage) {
-        this.bookingStorage = bookingStorage;
-        this.itemStorage = itemStorage;
-        this.userStorage = userStorage;
+    public BookingServiceImpl(UserRepository userRepository,
+                              ItemService itemService,
+                              BookingRepository bookingRepository) {
+        this.bookingRepository = bookingRepository;
+        this.userRepository = userRepository;
+        this.itemService = itemService;
     }
 
     @Override
     public BookingDao addBooking(Booking booking) {
-        checkedItemContains(booking.getItemId());
-        checkItemAvailable(booking.getItemId());
-        checkedUserContains(booking.getBookerId());
-        checkedTimeBooking(booking);
-        var item = itemStorage.get(booking.getItemId());
-        checkedBookerEqualsOwner(booking.getBookerId(), item.getOwner().getId());
+        CheckerBooking.checkedItemContains(itemService, booking.getItemId());
+        CheckerBooking.checkItemAvailable(itemService, booking.getItemId());
+        CheckerBooking.checkedUserContains(userRepository, booking.getBookerId());
+        CheckerBooking.checkedTimeBooking(booking);
+        var item = itemService.get(booking.getItemId());
+        CheckerBooking.checkedBookerEqualsOwner(booking.getBookerId(), item.getOwner().getId());
 
         booking.setStatus(Status.WAITING);
-        return bookingStorage.add(booking);
+        var tempBooking = bookingRepository.save(booking);
+        return get(tempBooking.getId());
     }
 
     @Override
     public BookingDao updateBooking(int id, int userId, boolean approved) {
-        checkedBookingContains(id);
-        checkedUserContains(userId);
+        CheckerBooking.checkedBookingContains(bookingRepository, id);
+        CheckerBooking.checkedUserContains(userRepository, userId);
 
-        var oldBooking = BookingMapper.fromBookingDao(bookingStorage.get(id));
-        checkedUpdate(oldBooking);
+        var oldBooking = BookingMapper.fromBookingDao(get(id));
+        CheckerBooking.checkedUpdate(oldBooking);
 
 
-        var item = itemStorage.get(oldBooking.getItemId());
-        checkedItemBookingByUser(item, userId);
+        var item = itemService.get(oldBooking.getItemId());
+        CheckerBooking.checkedItemBookingByUser(item, userId);
 
         oldBooking = BookingMapper.update(oldBooking, approved);
-        bookingStorage.update(oldBooking);
+
+        var tempBooking = bookingRepository.findById(oldBooking.getId()).orElseThrow();
+        tempBooking.setStatus(oldBooking.getStatus());
+        bookingRepository.save(tempBooking);
+
         return getBooking(id, userId);
     }
 
     @Override
     public BookingDao getBooking(int bookingId, int userId) {
-        checkedBookingContains(bookingId);
-        checkedUserContains(userId);
+        CheckerBooking.checkedBookingContains(bookingRepository, bookingId);
+        CheckerBooking.checkedUserContains(userRepository, userId);
 
-        var booking = bookingStorage.get(bookingId);
-        var item = itemStorage.get(booking.getItem().getId());
+        var booking = get(bookingId);
+        var item = itemService.get(booking.getItem().getId());
 
-        checkedBookingContainsUsers(userId, booking, item);
+        CheckerBooking.checkedBookingContainsUsers(userId, booking, item);
 
         return booking;
     }
 
     @Override
     public List<BookingDao> getAllBookingUser(int userId, State state) {
-        checkedUserContains(userId);
-        return bookingStorage.getAllByUserAndState(userId, state);
+        CheckerBooking.checkedUserContains(userRepository, userId);
+        return getAllByUserAndState(userId, state);
     }
 
     @Override
     public List<BookingDao> getAllBookingOwner(int userId, State state) {
-        checkedUserContains(userId);
-        var items = itemStorage.getAllByUser(userId);
-        return bookingStorage.getAllByItems(items, state);
+        CheckerBooking.checkedUserContains(userRepository, userId);
+        var items = itemService.getAllByUser(userId);
+        return getAllByItems(items, state);
     }
 
     @Override
     public BookingDao removeBooking(int bookingId) {
-        return bookingStorage.remove(bookingId);
+        var booking = get(bookingId);
+        bookingRepository.deleteById(bookingId);
+        return booking;
     }
 
-    private void checkedUpdate(Booking booking) {
-        if (!Status.WAITING.equals(booking.getStatus())) {
-            throw new UpdateFalseException("Предмет с id " + booking.getId() + " уже был обновлен");
-        }
+    private BookingDao get(int bookingId) {
+        var temp = bookingRepository.findById(bookingId).orElse(null);
+        return temp != null ? BookingMapper.toBookingDao(temp,
+                bookingRepository.getItem(temp.getItemId()).orElse(null)) : null;
     }
 
-    private void checkedBookingContains(int id) {
-        if (!bookingStorage.contains(id)) {
-            throw new ContainsFalseException("Заказ с id " + id + " не найден");
+    private List<BookingDao> getAllByItems(List<Item> items, State state) {
+        var allItem = items.stream()
+                .map(Item::getId)
+                .collect(Collectors.toList());
+        List<Booking> allBooking;
+        var time = LocalDateTime.now();
+        switch (state) {
+            case ALL:
+                allBooking = bookingRepository.findByItemIdInOrderByStartDesc(allItem);
+                break;
+            case WAITING:
+                allBooking = bookingRepository.findByItemIdInAndStatusOrderByStartDesc(allItem, Status.WAITING);
+                break;
+            case REJECTED:
+                allBooking = bookingRepository.findByItemIdInAndStatusOrderByStartDesc(allItem, Status.REJECTED);
+                break;
+            case PAST:
+                allBooking = bookingRepository.findByItemIdInAndEndBeforeOrderByStartDesc(allItem, time);
+                break;
+            case FUTURE:
+                allBooking = bookingRepository.findByItemIdInAndStartAfterOrderByStartDesc(allItem, time);
+                break;
+            case CURRENT:
+                allBooking = bookingRepository.findByItemIdInAndStartBeforeAndEndAfterOrderByStartDesc(allItem, time, time);
+                break;
+            default:
+                throw new IllegalStateException("Unknown state: " + state);
         }
+
+        return allBooking.stream()
+                .map(booking -> BookingMapper.toBookingDao(booking,
+                        bookingRepository.getItem(booking.getItemId()).orElse(null)))
+                .collect(Collectors.toList());
     }
 
-    private void checkedItemContains(Integer itemId) {
-        if (!itemStorage.contains(itemId)) {
-            throw new ContainsFalseException("Предмет с id " + itemId + " не найден");
+    private List<BookingDao> getAllByUserAndState(int userId, State state) {
+        List<Booking> allBooking;
+        switch (state) {
+            case ALL:
+                allBooking = bookingRepository.findByBookerIdOrderByStartDesc(userId);
+                break;
+            case WAITING:
+                allBooking = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING);
+                break;
+            case REJECTED:
+                allBooking = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, Status.REJECTED);
+                break;
+            case PAST:
+                allBooking = bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now());
+                break;
+            case FUTURE:
+                allBooking = bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now());
+                break;
+            case CURRENT:
+                var time = LocalDateTime.now();
+                allBooking = bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, time, time);
+                break;
+            default:
+                throw new IllegalStateException("Unknown state: " + state);
         }
-    }
 
-    private void checkedUserContains(Integer bookerId) {
-        if (!userStorage.contains(bookerId)) {
-            throw new ContainsFalseException("Пользователь с id " + bookerId + " не найден");
-        }
-    }
-
-    private void checkItemAvailable(Integer itemId) {
-        if (!itemStorage.get(itemId).getIsAvailable()) {
-            throw new AvailableFalseException("Предмет с id " + itemId + " занят");
-        }
-    }
-
-    private void checkedItemBookingByUser(Item item, Integer userId) {
-        if (!Objects.equals(item.getOwner().getId(), userId)) {
-            throw new NotOwnerException("Предмет с id " + item.getId() + " не принадлежит пользователю " + userId);
-        }
-    }
-
-    private void checkedTimeBooking(Booking booking) {
-        if (booking.getStart().isAfter(booking.getEnd())) {
-            throw new TimeFalseException("Некорретные значения времени");
-        }
-    }
-
-    private void checkedBookingContainsUsers(int userId, BookingDao booking, Item item) {
-        if (booking.getBooker().getId() != userId && item.getOwner().getId() != userId) {
-            throw new ContainsFalseException("Заказ с id " + booking.getId() + " не связан с пользователями");
-        }
-    }
-
-    private void checkedBookerEqualsOwner(Integer bookerId, Integer owner) {
-        if (bookerId.equals(owner)) {
-            throw new ContainsFalseException("У заказа одинаковый пользователь и заказчик");
-        }
+        return allBooking.stream()
+                .map(booking -> BookingMapper.toBookingDao(booking,
+                        bookingRepository.getItem(booking.getItemId()).orElse(null)))
+                .collect(Collectors.toList());
     }
 }
