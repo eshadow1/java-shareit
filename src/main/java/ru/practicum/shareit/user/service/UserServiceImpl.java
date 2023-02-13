@@ -1,9 +1,8 @@
 package ru.practicum.shareit.user.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserStorage;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.utils.exception.ContainsFalseException;
 import ru.practicum.shareit.utils.exception.ContainsTrueException;
 
@@ -11,16 +10,14 @@ import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
 
-    public UserServiceImpl(@Qualifier("inMemory") UserStorage userStorage) {
-        this.userStorage = userStorage;
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     public User addUser(User user) {
-        checkedUserContainsByEmail(user.getEmail());
-
-        return userStorage.add(user);
+        return userRepository.save(user);
     }
 
     public User updateUser(int id, User user) {
@@ -31,36 +28,48 @@ public class UserServiceImpl implements UserService {
             checkedUserContainsByEmail(user.getEmail());
         }
 
-        return userStorage.update(user);
+        var tempUser = userRepository.findById(user.getId()).orElseThrow();
+
+        if (user.getEmail() != null) {
+            tempUser.setEmail(user.getEmail());
+        }
+
+        if (user.getName() != null) {
+            tempUser.setName(user.getName());
+        }
+
+        return userRepository.save(tempUser);
     }
 
     public User getUser(int userId) {
         checkedUserContains(userId);
 
-        return userStorage.get(userId);
+        return userRepository.findById(userId).orElse(null);
     }
 
     public List<User> getAllUsers() {
-        return userStorage.getAll();
+        return userRepository.findAll();
     }
 
     public User removeUser(int userId) {
-        return userStorage.remove(userId);
+        var user = userRepository.findById(userId).orElse(null);
+        userRepository.deleteById(userId);
+        return user;
     }
 
     private void checkedUserContains(int id) {
-        if (!userStorage.contains(id)) {
+        if (userRepository.findById(id).isEmpty()) {
             throw new ContainsFalseException("Пользователь с id " + id + " не найден");
         }
     }
 
     private void checkedUserContainsByEmail(String email) {
-        if (userStorage.contains(email)) {
+        if (userRepository.findByEmail(email).isPresent()) {
             throw new ContainsTrueException("Пользователь с почтой " + email + " уже существует");
         }
     }
 
     private boolean checkedUpdatedEmail(int id, String email) {
-        return !userStorage.get(id).getEmail().equals(email);
+        return !userRepository.findById(id).get().getEmail().equals(email);
     }
 }

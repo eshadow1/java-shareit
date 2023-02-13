@@ -2,7 +2,8 @@ package ru.practicum.shareit.item.repository;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.model.comment.Comment;
+import ru.practicum.shareit.item.model.item.Item;
 import ru.practicum.shareit.utils.GeneratorId;
 
 import java.util.*;
@@ -25,23 +26,23 @@ public class InMemoryItemStorage implements ItemStorage {
     public Item add(Item item) {
         Item creatingUser = item.toBuilder().id(generatorId.getId()).build();
         items.put(creatingUser.getId(), creatingUser);
-        if (!itemsByUser.containsKey(creatingUser.getOwner())) {
-            itemsByUser.put(creatingUser.getOwner(), new HashSet<>());
+        if (!itemsByUser.containsKey(creatingUser.getOwner().getId())) {
+            itemsByUser.put(creatingUser.getOwner().getId(), new HashSet<>());
         }
-        itemsByUser.get(creatingUser.getOwner()).add(creatingUser.getId());
+        itemsByUser.get(creatingUser.getOwner().getId()).add(creatingUser.getId());
         return creatingUser;
     }
 
     @Override
     public Item remove(Item item) {
-        itemsByUser.get(item.getOwner()).remove(item.getId());
+        itemsByUser.get(item.getOwner().getId()).remove(item.getId());
         return items.remove(item.getId());
     }
 
     @Override
     public Item remove(int itemId) {
         if (items.containsKey(itemId)) {
-            itemsByUser.get(items.get(itemId).getOwner()).remove(itemId);
+            itemsByUser.get(items.get(itemId).getOwner().getId()).remove(itemId);
         }
         return items.remove(itemId);
     }
@@ -53,8 +54,10 @@ public class InMemoryItemStorage implements ItemStorage {
 
     @Override
     public List<Item> getAllByUser(int userId) {
-        if (!itemsByUser.containsKey(userId))
+        if (!itemsByUser.containsKey(userId)) {
             return Collections.emptyList();
+        }
+
         return itemsByUser.get(userId).stream()
                 .map(items::get)
                 .collect(Collectors.toList());
@@ -76,9 +79,14 @@ public class InMemoryItemStorage implements ItemStorage {
         final var tempText = text.toLowerCase(russianLocal);
         return items.values()
                 .stream()
-                .filter(Item::getAvailable)
+                .filter(Item::getIsAvailable)
                 .filter(item -> item.getDescription().toLowerCase(russianLocal).contains(tempText)
                         || item.getName().toLowerCase(russianLocal).contains(tempText))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<Comment> addComment(Comment comment) {
+        return Optional.empty();
     }
 }

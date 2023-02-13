@@ -1,8 +1,10 @@
 package ru.practicum.shareit.item.repository;
 
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.model.comment.Comment;
+import ru.practicum.shareit.item.model.item.Item;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ItemStorage {
     List<Item> getAllByUser(int userId);
@@ -20,4 +22,6 @@ public interface ItemStorage {
     boolean contains(int itemId);
 
     List<Item> searchItems(String text);
+
+    Optional<Comment> addComment(Comment comment);
 }

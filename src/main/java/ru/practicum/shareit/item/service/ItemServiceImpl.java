@@ -1,84 +1,144 @@
 package ru.practicum.shareit.item.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.model.ItemMapper;
-import ru.practicum.shareit.item.repository.ItemStorage;
-import ru.practicum.shareit.user.repository.UserStorage;
-import ru.practicum.shareit.utils.exception.ContainsFalseException;
-import ru.practicum.shareit.utils.exception.UserNotFoundException;
+import ru.practicum.shareit.booking.dto.BookingItemDao;
+import ru.practicum.shareit.item.model.comment.Comment;
+import ru.practicum.shareit.item.model.item.Item;
+import ru.practicum.shareit.item.model.item.ItemMapper;
+import ru.practicum.shareit.item.repository.CommentRepository;
+import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ItemServiceImpl implements ItemService {
-    private final ItemStorage itemStorage;
-    private final UserStorage userStorage;
+    private final ItemRepository itemRepository;
+    private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
 
-    public ItemServiceImpl(@Qualifier("inMemory") ItemStorage itemStorage,
-                           @Qualifier("inMemory") UserStorage userStorage) {
-        this.itemStorage = itemStorage;
-        this.userStorage = userStorage;
+    public ItemServiceImpl(UserRepository userRepository,
+                           ItemRepository itemRepository,
+                           CommentRepository commentRepository) {
+        this.userRepository = userRepository;
+        this.itemRepository = itemRepository;
+        this.commentRepository = commentRepository;
     }
 
     public Item addItem(Item item) {
-        checkedUserContains(item.getOwner());
+        CheckerItem.checkedUserContains(userRepository, item.getOwner().getId());
 
-        return itemStorage.add(item);
+        return itemRepository.save(item);
     }
 
     public Item updateItem(int id, Item item) {
-        checkedItemContains(id);
-        checkedUserContains(item.getOwner());
+        CheckerItem.checkedItemContains(itemRepository, id);
+        CheckerItem.checkedUserContains(userRepository, item.getOwner().getId());
 
-        var oldItem = itemStorage.get(id);
-        checkedItemForUser(oldItem.getOwner(), item.getOwner());
+        var oldItem = get(id);
+        CheckerItem.checkedItemForUser(oldItem.getOwner().getId(), item.getOwner().getId());
 
         oldItem = ItemMapper.update(oldItem, item);
-        itemStorage.update(oldItem);
-        return oldItem;
+
+        var tempItem = itemRepository.findById(oldItem.getId()).orElseThrow();
+
+        tempItem.setName(oldItem.getName());
+        tempItem.setDescription(oldItem.getDescription());
+        tempItem.setIsAvailable(oldItem.getIsAvailable());
+
+        return itemRepository.save(tempItem);
     }
 
     public Item getItem(int itemId) {
-        checkedItemContains(itemId);
+        CheckerItem.checkedItemContains(itemRepository, itemId);
 
-        return itemStorage.get(itemId);
+        return get(itemId);
     }
 
     public List<Item> getAllItemsByUser(int userId) {
-        checkedUserContains(userId);
+        CheckerItem.checkedUserContains(userRepository, userId);
 
-        return itemStorage.getAllByUser(userId);
+        return getAllByUser(userId);
     }
 
     public Item removeItem(int itemId) {
-        return itemStorage.remove(itemId);
+        var item = get(itemId);
+        itemRepository.deleteById(itemId);
+        return item;
     }
 
     @Override
     public List<Item> searchItems(int userId, String text) {
-        checkedUserContains(userId);
+        CheckerItem.checkedUserContains(userRepository, userId);
 
-        return itemStorage.searchItems(text);
+        final var russianLocal = new Locale("ru");
+        final var tempText = "%" + text.toLowerCase(russianLocal) + "%";
+
+        return itemRepository.searchItemsBy(tempText);
     }
 
-    private void checkedItemContains(int id) {
-        if (!itemStorage.contains(id)) {
-            throw new ContainsFalseException("Предмет с id " + id + " не найден");
-        }
+    @Override
+    public Comment addComment(Comment comment) {
+        CheckerItem.checkedUserContains(userRepository, comment.getAuthor().getId());
+        CheckerItem.checkedItemContains(itemRepository, comment.getItem().getId());
+        var addComment = addCommentOrEmpty(comment);
+        CheckerItem.checkedAddComment(addComment, comment.getItem().getId());
+        return addComment.get();
     }
 
-    private void checkedItemForUser(int id, int owner) {
-        if (id != owner) {
-            throw new ContainsFalseException("Предмет с id " + id + " не принадлежит пользователю " + owner);
-        }
+    @Override
+    public Item get(int itemId) {
+        var item = itemRepository.findById(itemId).orElse(null);
+
+        var lastAll = itemRepository.findAllLastBookingByItemId(item.getId());
+        BookingItemDao last = lastAll.isEmpty() ? null : lastAll.get(0);
+
+        var futureAll = itemRepository.findAllFutureBookingByItemId(itemId);
+        BookingItemDao future = futureAll.isEmpty() ? null : futureAll.get(0);
+
+        return item.toBuilder()
+                .comments(commentRepository.findAllByItemId(itemId))
+                .lastBooking(last)
+                .nextBooking(future)
+                .build();
     }
 
-    private void checkedUserContains(int owner) {
-        if (!userStorage.contains(owner)) {
-            throw new UserNotFoundException("Пользователь с id " + owner + " не найден");
+    @Override
+    public List<Item> getAllByUser(int userId) {
+        var user = itemRepository.getUser(userId);
+        if (user.isEmpty())
+            return null;
+        return itemRepository.findByOwnerOrderByIdAsc(user.get()).stream()
+                .map(item -> {
+                    var lastAll = itemRepository.findAllLastBookingByItemId(item.getId());
+                    BookingItemDao last = lastAll.isEmpty() ? null : lastAll.get(0);
+
+                    var futureAll = itemRepository.findAllFutureBookingByItemId(item.getId());
+                    BookingItemDao future = futureAll.isEmpty() ? null : futureAll.get(0);
+
+                    return item.toBuilder()
+                            .comments(commentRepository.findAllByItemId(item.getId()))
+                            .lastBooking(last)
+                            .nextBooking(future)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean contains(Integer itemId) {
+        return itemRepository.findById(itemId).isPresent();
+    }
+
+    private Optional<Comment> addCommentOrEmpty(Comment comment) {
+        var items = commentRepository.getBookingByItemIdAndAuthorId(comment.getItem().getId(), comment.getAuthor().getId());
+        if (items.isEmpty()) {
+            return Optional.empty();
         }
+        return Optional.of(commentRepository.save(comment));
     }
 }
 
