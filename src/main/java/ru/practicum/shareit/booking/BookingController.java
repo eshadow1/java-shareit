@@ -8,6 +8,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.BookingMapper;
 import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.utils.exception.BadNumberException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -54,13 +55,20 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDao> getBookings(@RequestHeader(name = "X-Sharer-User-Id") int userId,
-                                        @RequestParam(defaultValue = "ALL") String state) {
+                                        @RequestParam(defaultValue = "ALL") String state,
+                                        @RequestParam(defaultValue = "0") int from,
+                                        @RequestParam(defaultValue = "20") int size) {
         log.info("Получен запрос на получение всех заказов от пользователя " + userId);
+
+        if (from < 0)
+            throw new BadNumberException("from меньше 0");
+        if (size <= 0)
+            throw new BadNumberException("size меньше 0");
 
         try {
             var newState = State.valueOf(state);
 
-            return bookingServiceImpl.getAllBookingUser(userId, newState);
+            return bookingServiceImpl.getAllBookingUser(userId, newState, from / size, size);
         } catch (IllegalArgumentException er) {
             throw new IllegalStateException("Unknown state: " + state);
         }
@@ -68,12 +76,19 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<BookingDao> getBookingsOwner(@RequestHeader(name = "X-Sharer-User-Id") int userId,
-                                             @RequestParam(defaultValue = "ALL") String state) {
+                                             @RequestParam(defaultValue = "ALL") String state,
+                                             @RequestParam(defaultValue = "0") int from,
+                                             @RequestParam(defaultValue = "20") int size) {
         log.info("Получен запрос на получение всех заказов от пользователя " + userId);
+        if (from < 0)
+            throw new BadNumberException("from меньше 0");
+        if (size <= 0)
+            throw new BadNumberException("size меньше 0");
+
         try {
             var newState = State.valueOf(state);
 
-            return bookingServiceImpl.getAllBookingOwner(userId, newState);
+            return bookingServiceImpl.getAllBookingOwner(userId, newState, from / size, size);
         } catch (IllegalArgumentException er) {
             throw new IllegalStateException("Unknown state: " + state);
         }

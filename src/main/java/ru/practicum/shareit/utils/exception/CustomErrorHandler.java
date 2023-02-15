@@ -71,4 +71,9 @@ public class CustomErrorHandler {
         return Map.of("error", HttpStatus.BAD_REQUEST + ": " + error.getMessage());
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleBadNumberException(final BadNumberException error) {
+        return Map.of("error", HttpStatus.BAD_REQUEST + ": " + error.getMessage());
+    }
 }

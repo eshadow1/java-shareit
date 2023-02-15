@@ -12,11 +12,11 @@ public interface ItemService {
 
     Item getItem(int userId);
 
-    List<Item> getAllItemsByUser(int itemId);
+    List<Item> getAllItemsByUser(int itemId, int from, int size);
 
     Item removeItem(int itemId);
 
-    List<Item> searchItems(int userId, String text);
+    List<Item> searchItems(int userId, String text, int from, int size);
 
     Comment addComment(Comment comment);
 
