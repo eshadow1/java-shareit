@@ -117,6 +117,7 @@ class BookingMapperTest {
                 .description("description")
                 .isAvailable(false)
                 .build();
+
         var bookingDao = BookingMapper.toBookingDao(booking, item);
         var itemDao = ItemDao.builder()
                 .id(1)

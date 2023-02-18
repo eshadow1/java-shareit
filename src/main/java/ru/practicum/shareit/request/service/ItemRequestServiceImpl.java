@@ -40,7 +40,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         var user = userRepository.findById(userId);
         checkedUser(userId, user);
 
-
         return itemRequestRepository.findItemRequestByRequestorId(user.get());
     }
 
