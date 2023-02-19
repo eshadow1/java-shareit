@@ -132,9 +132,8 @@ class ItemServiceImplTest {
 
     @Test
     void getItemNotFound() {
-        assertThrows(ContainsFalseException.class, () -> {
-            itemService.getItem(correctItem.getId());
-        });
+        assertThrows(ContainsFalseException.class,
+                () -> itemService.getItem(correctItem.getId()));
     }
 
     @Test
@@ -163,7 +162,7 @@ class ItemServiceImplTest {
         itemService.addItem(correctItem);
 
         assertThrows(AddFalseException.class,
-                ()->itemService.addComment(comment));
+                () -> itemService.addComment(comment));
     }
 
     @Test
