@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.item.model.item.Item;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.utils.exception.ContainsFalseException;
 import ru.practicum.shareit.utils.exception.UserNotFoundException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -120,12 +121,9 @@ class ItemServiceImplTest {
 
     @Test
     void getItemNotFound() {
-        itemService.addItem(correctItem);
-        var item = itemService.getItem(correctItem.getId());
-
-        assertEquals(item.getId(), correctItem.getId());
-        assertEquals(item.getName(), correctItem.getName());
-        assertEquals(item.getDescription(), correctItem.getDescription());
+        assertThrows(ContainsFalseException.class, () -> {
+            itemService.getItem(correctItem.getId());
+        });
     }
 
     @Test

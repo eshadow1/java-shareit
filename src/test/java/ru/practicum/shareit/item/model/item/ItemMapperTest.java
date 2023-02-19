@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.model.item;
 
 import org.junit.jupiter.api.Test;
+import ru.practicum.shareit.booking.dto.BookingItemDao;
 import ru.practicum.shareit.item.dto.item.ItemDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
@@ -66,6 +67,8 @@ class ItemMapperTest {
                 .isAvailable(false)
                 .owner(user)
                 .itemRequest(itemRequest)
+                .lastBooking(new BookingItemDao())
+                .nextBooking(new BookingItemDao())
                 .build();
 
         assertEquals(item.getDescription(), correctItem.getDescription());
@@ -80,7 +83,14 @@ class ItemMapperTest {
                 .name("Test")
                 .email("test@test.test")
                 .build();
-
+        var nextBooking = BookingItemDao.builder()
+                .id(3)
+                .bookerId(1)
+                .build();
+        var lastBooking = BookingItemDao.builder()
+                .id(2)
+                .bookerId(2)
+                .build();
         var item = Item.builder()
                 .id(1)
                 .name("test")
@@ -88,6 +98,8 @@ class ItemMapperTest {
                 .isAvailable(false)
                 .owner(user)
                 .itemRequest(null)
+                .lastBooking(lastBooking)
+                .nextBooking(nextBooking)
                 .build();
         var itemDto = ItemMapper.toItemDto(item);
 

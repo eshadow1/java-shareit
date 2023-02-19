@@ -18,6 +18,7 @@ import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.service.ItemRequestServiceImpl;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.utils.exception.UserNotFoundException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -257,5 +258,45 @@ class ItemControllerTest {
 
         verify(itemService, times(1))
                 .searchItems(anyInt(), anyString(), anyInt(), anyInt());
+    }
+
+    @Test
+    void searchItemsWithThrow() {
+        when(itemService.searchItems(anyInt(), anyString(), anyInt(), anyInt()))
+                .thenThrow(UserNotFoundException.class);
+
+        try {
+            mockMvc.perform(get(endpoint + "/search")
+                            .characterEncoding(StandardCharsets.UTF_8)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("X-Sharer-User-Id", 99)
+                            .param("text", "test")
+                            .accept(MediaType.APPLICATION_JSON)
+                    ).andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isNotFound());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        verify(itemService, times(1))
+                .searchItems(anyInt(), anyString(), anyInt(), anyInt());
+    }
+
+    @Test
+    void searchItemsWithThrowBadNumber() {
+        try {
+            mockMvc.perform(get(endpoint + "/search")
+                            .characterEncoding(StandardCharsets.UTF_8)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("X-Sharer-User-Id", 1)
+                            .param("text", "test")
+                            .param("from", "0")
+                            .param("size", "0")
+                            .accept(MediaType.APPLICATION_JSON)
+                    ).andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isBadRequest());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

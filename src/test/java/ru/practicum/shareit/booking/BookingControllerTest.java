@@ -17,6 +17,9 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.dto.item.ItemDao;
+import ru.practicum.shareit.utils.exception.AvailableFalseException;
+import ru.practicum.shareit.utils.exception.NotOwnerException;
+import ru.practicum.shareit.utils.exception.TimeFalseException;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -106,8 +109,49 @@ class BookingControllerTest {
     }
 
     @Test
+    void addBookingAvailable() {
+        when(bookingService.addBooking(any())).thenThrow(AvailableFalseException.class);
+
+        try {
+            mockMvc.perform(post(endpoint)
+                            .content(jsonBooking)
+                            .characterEncoding(StandardCharsets.UTF_8)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("X-Sharer-User-Id", 1)
+                            .accept(MediaType.APPLICATION_JSON)
+                    ).andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isBadRequest());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        verify(bookingService, times(1)).addBooking(any());
+    }
+
+    @Test
+    void addBookingTimeError() {
+        when(bookingService.addBooking(any())).thenThrow(TimeFalseException.class);
+
+        try {
+            mockMvc.perform(post(endpoint)
+                            .content(jsonBooking)
+                            .characterEncoding(StandardCharsets.UTF_8)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("X-Sharer-User-Id", 1)
+                            .accept(MediaType.APPLICATION_JSON)
+                    ).andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isBadRequest());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        verify(bookingService, times(1)).addBooking(any());
+    }
+
+    @Test
     void updateBooking() {
-        when(bookingService.updateBooking(anyInt(), anyInt(), anyBoolean())).thenReturn(bookingDao);
+        when(bookingService.updateBooking(anyInt(), anyInt(), anyBoolean()))
+                .thenReturn(bookingDao);
 
         try {
             mockMvc.perform(patch(endpoint + "/1")
@@ -125,6 +169,25 @@ class BookingControllerTest {
         }
 
         verify(bookingService, times(1)).updateBooking(anyInt(), anyInt(),  anyBoolean());
+    }
+
+    @Test
+    void updateBookingOtherUser() {
+        when(bookingService.updateBooking(anyInt(), anyInt(), anyBoolean()))
+                .thenThrow(NotOwnerException.class);
+
+        try {
+            mockMvc.perform(patch(endpoint + "/1")
+                            .content(jsonBooking)
+                            .characterEncoding(StandardCharsets.UTF_8)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("X-Sharer-User-Id", 1)
+                            .accept(MediaType.APPLICATION_JSON)
+                    ).andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isBadRequest());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test

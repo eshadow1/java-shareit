@@ -16,6 +16,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.utils.exception.ContainsFalseException;
+import ru.practicum.shareit.utils.exception.ContainsTrueException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -156,6 +157,22 @@ class UserControllerTest {
                     ).andExpect(status().isOk())
                     .andExpect(jsonPath("$.name", is(updateUser.getName())))
                     .andExpect(jsonPath("$.email", is(updateUser.getEmail())));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        verify(userService, times(1)).updateUser(anyInt(), any());
+    }
+
+    @Test
+    void updateUserContainsTrue() {
+        when(userService.updateUser(anyInt(), any())).thenThrow(ContainsTrueException.class);
+
+        try {
+            mockMvc.perform(patch(endpoint + "/1")
+                            .content(jsonUpdateUser)
+                            .contentType(MediaType.APPLICATION_JSON)
+                    ).andExpect(status().isConflict());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
