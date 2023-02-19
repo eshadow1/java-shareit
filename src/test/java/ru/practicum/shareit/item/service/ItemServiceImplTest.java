@@ -9,9 +9,11 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.item.model.comment.Comment;
 import ru.practicum.shareit.item.model.item.Item;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.utils.exception.AddFalseException;
 import ru.practicum.shareit.utils.exception.ContainsFalseException;
 import ru.practicum.shareit.utils.exception.UserNotFoundException;
 
@@ -39,6 +41,8 @@ class ItemServiceImplTest {
 
     private static Item updateCorrectItem;
 
+    private static Comment comment;
+
     @BeforeAll
     public static void beforeAll() {
         user = User.builder()
@@ -49,8 +53,8 @@ class ItemServiceImplTest {
 
         user2 = User.builder()
                 .id(2)
-                .name("user")
-                .email("user@user.com")
+                .name("user2")
+                .email("user2@user.com")
                 .build();
 
         correctItem = Item.builder()
@@ -75,6 +79,13 @@ class ItemServiceImplTest {
                 .description("test test")
                 .isAvailable(false)
                 .owner(user)
+                .build();
+
+        comment = Comment.builder()
+                .text("test")
+                .item(correctItem)
+                .author(user)
+                .authorName(user.getName())
                 .build();
     }
 
@@ -148,6 +159,21 @@ class ItemServiceImplTest {
 
     @Test
     void addComment() {
+        userService.addUser(user);
+        itemService.addItem(correctItem);
+
+        assertThrows(AddFalseException.class,
+                ()->itemService.addComment(comment));
+    }
+
+    @Test
+    void searchItems() {
+        userService.addUser(user);
+        userService.addUser(user2);
+        itemService.addItem(correctItem);
+
+        var items = itemService.searchItems(user.getId(), "test", 0, 1);
+        assertEquals(items.size(), 0);
     }
 
     @Test

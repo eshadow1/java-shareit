@@ -259,6 +259,80 @@ class BookingControllerTest {
     }
 
     @Test
+    void getBookingsOwnerFromError() {
+        try {
+            mockMvc.perform(get(endpoint + "/owner")
+                            .content(jsonBooking)
+                            .characterEncoding(StandardCharsets.UTF_8)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("X-Sharer-User-Id", 1)
+                            .param("from", "-1")
+                            .param("size", "1")
+                            .accept(MediaType.APPLICATION_JSON)
+                    ).andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isBadRequest());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    void getBookingsOwnerSizeError() {
+        try {
+            mockMvc.perform(get(endpoint + "/owner")
+                            .content(jsonBooking)
+                            .characterEncoding(StandardCharsets.UTF_8)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("X-Sharer-User-Id", 1)
+                            .param("from", "0")
+                            .param("size", "0")
+                            .accept(MediaType.APPLICATION_JSON)
+                    ).andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isBadRequest());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    void getBookingsOwnerStateError() {
+        try {
+            mockMvc.perform(get(endpoint + "/owner")
+                            .content(jsonBooking)
+                            .characterEncoding(StandardCharsets.UTF_8)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("X-Sharer-User-Id", 1)
+                            .param("state", "0")
+                            .param("from", "0")
+                            .param("size", "1")
+                            .accept(MediaType.APPLICATION_JSON)
+                    ).andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isBadRequest());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    void getBookingsStateError() {
+        try {
+            mockMvc.perform(get(endpoint + "/owner")
+                            .content(jsonBooking)
+                            .characterEncoding(StandardCharsets.UTF_8)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("X-Sharer-User-Id", 1)
+                            .param("state", "0")
+                            .param("from", "0")
+                            .param("size", "1")
+                            .accept(MediaType.APPLICATION_JSON)
+                    ).andDo(MockMvcResultHandlers.print())
+                    .andExpect(status().isBadRequest());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
     void removeBooking() {
         when(bookingService.removeBooking(anyInt()))
             .thenReturn(bookingDao);

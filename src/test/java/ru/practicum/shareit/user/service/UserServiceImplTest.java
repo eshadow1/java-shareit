@@ -10,6 +10,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.utils.exception.ContainsFalseException;
+import ru.practicum.shareit.utils.exception.ContainsTrueException;
 
 import javax.validation.ValidationException;
 
@@ -26,10 +27,12 @@ class UserServiceImplTest {
     private UserService userService;
 
     private static User correctUser;
+    private static User correctUser2;
 
     private static User userWithoutEmail;
 
     private static User updateCorrectUser;
+    private static User updateCorrectUser2;
 
     @BeforeAll
     public static void beforeAll() {
@@ -37,6 +40,11 @@ class UserServiceImplTest {
                 .id(1)
                 .name("user")
                 .email("user@user.com")
+                .build();
+        correctUser2 = User.builder()
+                .id(2)
+                .name("user2")
+                .email("user2@user.com")
                 .build();
         userWithoutEmail = User.builder()
                 .id(1)
@@ -46,6 +54,11 @@ class UserServiceImplTest {
                 .id(1)
                 .name("updateuser")
                 .email("user@user.com")
+                .build();
+        updateCorrectUser2 = User.builder()
+                .id(1)
+                .name("updateuser")
+                .email("user2@user.com")
                 .build();
     }
 
@@ -81,6 +94,14 @@ class UserServiceImplTest {
         assertEquals(updateUser.getId(), updateCorrectUser.getId());
         assertEquals(updateUser.getName(), updateCorrectUser.getName());
         assertEquals(updateUser.getEmail(), updateCorrectUser.getEmail());
+    }
+
+    @Test
+    void updateUserEmail() {
+        userService.addUser(correctUser);
+        userService.addUser(correctUser2);
+        assertThrows(ContainsTrueException.class,
+                () -> userService.updateUser(1, updateCorrectUser2));
     }
 
     @Test

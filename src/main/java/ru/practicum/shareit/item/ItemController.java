@@ -122,7 +122,7 @@ public class ItemController {
         if (size <= 0)
             throw new BadNumberException("size меньше 0");
 
-        if (text.isEmpty()) {
+        if (text.isEmpty() || text.isBlank()) {
             return Collections.emptyList();
         }
 

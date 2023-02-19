@@ -213,7 +213,7 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllBookingUser() {
+    void getAllBookingUserAll() {
         bookingService.addBooking(correctBooking);
         var booking = bookingService.getAllBookingUser(user2.getId(), State.ALL, 0, 1);
 
@@ -224,7 +224,50 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllBookingOwner() {
+    void getAllBookingUserWaiting() {
+        bookingService.addBooking(correctBooking);
+        var booking = bookingService.getAllBookingUser(user2.getId(), State.WAITING, 0, 1);
+
+        assertEquals(booking.size(), 1);
+        assertEquals(booking.get(0).getId(), correctBooking.getId());
+        assertEquals(booking.get(0).getStart(), correctBooking.getStart());
+        assertEquals(booking.get(0).getEnd(), correctBooking.getEnd());
+    }
+
+    @Test
+    void getAllBookingUserRejected() {
+        bookingService.addBooking(correctBooking);
+        var booking = bookingService.getAllBookingUser(user2.getId(), State.REJECTED, 0, 1);
+
+        assertEquals(booking.size(), 0);
+    }
+
+    @Test
+    void getAllBookingUserFuture() {
+        bookingService.addBooking(correctBooking);
+        var booking = bookingService.getAllBookingUser(user2.getId(), State.FUTURE, 0, 1);
+
+        assertEquals(booking.size(), 0);
+    }
+
+    @Test
+    void getAllBookingUserPast() {
+        bookingService.addBooking(correctBooking);
+        var booking = bookingService.getAllBookingUser(user2.getId(), State.PAST, 0, 1);
+
+        assertEquals(booking.size(), 1);
+    }
+
+    @Test
+    void getAllBookingUserCurrent() {
+        bookingService.addBooking(correctBooking);
+        var booking = bookingService.getAllBookingUser(user2.getId(), State.CURRENT, 0, 1);
+
+        assertEquals(booking.size(), 0);
+    }
+
+    @Test
+    void getAllBookingOwnerAll() {
         bookingService.addBooking(correctBooking);
         var booking = bookingService.getAllBookingOwner(user.getId(), State.ALL, 0, 1);
 
@@ -234,4 +277,54 @@ class BookingServiceImplTest {
         assertEquals(booking.get(0).getEnd(), correctBooking.getEnd());
     }
 
+    @Test
+    void getAllBookingOwnerwWaiting() {
+        bookingService.addBooking(correctBooking);
+        var booking = bookingService.getAllBookingOwner(user.getId(), State.WAITING, 0, 1);
+
+        assertEquals(booking.size(), 1);
+        assertEquals(booking.get(0).getId(), correctBooking.getId());
+        assertEquals(booking.get(0).getStart(), correctBooking.getStart());
+        assertEquals(booking.get(0).getEnd(), correctBooking.getEnd());
+    }
+
+    @Test
+    void getAllBookingOwnerRejected() {
+        bookingService.addBooking(correctBooking);
+        var booking = bookingService.getAllBookingOwner(user.getId(), State.REJECTED, 0, 1);
+
+        assertEquals(booking.size(), 0);
+    }
+
+    @Test
+    void getAllBookingOwnerFuture() {
+        bookingService.addBooking(correctBooking);
+        var booking = bookingService.getAllBookingOwner(user.getId(), State.FUTURE, 0, 1);
+
+        assertEquals(booking.size(), 0);
+    }
+
+    @Test
+    void getAllBookingOwnerPast() {
+        bookingService.addBooking(correctBooking);
+        var booking = bookingService.getAllBookingOwner(user.getId(), State.PAST, 0, 1);
+
+        assertEquals(booking.size(), 1);
+    }
+
+    @Test
+    void getAllBookingOwnerCurrent() {
+        bookingService.addBooking(correctBooking);
+        var booking = bookingService.getAllBookingOwner(user.getId(), State.CURRENT, 0, 1);
+
+        assertEquals(booking.size(), 0);
+    }
+
+    @Test
+    void removeBooking() {
+        bookingService.addBooking(correctBooking);
+        var removeBooking = bookingService.removeBooking(correctBooking.getId());
+
+        assertEquals(removeBooking.getId(), correctBooking.getId());
+    }
 }

@@ -60,10 +60,7 @@ public class BookingController {
                                         @RequestParam(defaultValue = "20") int size) {
         log.info("Получен запрос на получение всех заказов от пользователя " + userId);
 
-        if (from < 0)
-            throw new BadNumberException("from меньше 0");
-        if (size <= 0)
-            throw new BadNumberException("size меньше 0");
+        checkedFromAndSize(from, size);
 
         try {
             var newState = State.valueOf(state);
@@ -80,10 +77,8 @@ public class BookingController {
                                              @RequestParam(defaultValue = "0") int from,
                                              @RequestParam(defaultValue = "20") int size) {
         log.info("Получен запрос на получение всех заказов от пользователя " + userId);
-        if (from < 0)
-            throw new BadNumberException("from меньше 0");
-        if (size <= 0)
-            throw new BadNumberException("size меньше 0");
+
+        checkedFromAndSize(from, size);
 
         try {
             var newState = State.valueOf(state);
@@ -99,5 +94,12 @@ public class BookingController {
         log.info("Получен запрос на удаление заказа " + id);
 
         return bookingServiceImpl.removeBooking(id);
+    }
+
+    private void checkedFromAndSize(int from, int size) {
+        if (from < 0)
+            throw new BadNumberException("from меньше 0");
+        if (size <= 0)
+            throw new BadNumberException("size меньше 0");
     }
 }
