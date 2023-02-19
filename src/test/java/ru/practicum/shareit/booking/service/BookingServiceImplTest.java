@@ -85,7 +85,7 @@ class BookingServiceImplTest {
                 .bookerId(user2.getId())
                 .status(Status.WAITING)
                 .build();
-        
+
         updateCorrectBooking = Booking.builder()
                 .id(1)
                 .start(LocalDateTime.of(2021, 1, 1, 1, 0, 1))

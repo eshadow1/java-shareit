@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.model.UserMapper;
-import ru.practicum.shareit.user.service.UserServiceImpl;
+import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -20,9 +20,9 @@ import java.util.List;
 @RequestMapping(path = "/users")
 public class UserController {
     private static final int USER_WITHOUT_ID = 0;
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
-    public UserController(UserServiceImpl userService) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
