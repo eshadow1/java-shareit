@@ -1,14 +1,16 @@
 package ru.practicum.shareit.request;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.model.ItemRequestMapper;
 import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.service.UserService;
-import ru.practicum.shareit.utils.exception.BadNumberException;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping(path = "/requests")
+@Validated
 public class ItemRequestController {
     private final ItemRequestService itemRequestService;
     private final UserService userService;
@@ -58,14 +61,11 @@ public class ItemRequestController {
     }
 
     @GetMapping("/all")
+    @Validated
     public List<ItemRequestDto> getAllItemRequest(@RequestHeader(name = "X-Sharer-User-Id") int userId,
-                                                  @RequestParam(defaultValue = "0") int from,
-                                                  @RequestParam(defaultValue = "1") int size) {
+                                                  @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                                  @RequestParam(defaultValue = "1") @Positive int size) {
         log.info("Получен запрос на получение запросов с " + from + " размером " + size + " от пользователя " + userId);
-        if (from < 0)
-            throw new BadNumberException("from меньше 0");
-        if (size <= 0)
-            throw new BadNumberException("size меньше 0");
 
         return itemRequestService.getItemRequestFromSize(userId, from / size, size).stream()
                 .map(ItemRequestMapper::toItemRequestDto)

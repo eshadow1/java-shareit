@@ -9,6 +9,7 @@ import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.request.ItemRequestController;
 import ru.practicum.shareit.user.UserController;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Map;
 
 @RestControllerAdvice(assignableTypes = {UserController.class,
@@ -73,7 +74,7 @@ public class CustomErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleBadNumberException(final BadNumberException error) {
+    public Map<String, String> handleConstraintViolationException(final ConstraintViolationException error) {
         return Map.of("error", HttpStatus.BAD_REQUEST + ": " + error.getMessage());
     }
 }

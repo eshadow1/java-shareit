@@ -2,15 +2,17 @@ package ru.practicum.shareit.booking;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDao;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.BookingMapper;
 import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.utils.exception.BadNumberException;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 /**
@@ -20,6 +22,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(path = "/bookings")
+@Validated
 public class BookingController {
     private final BookingService bookingServiceImpl;
 
@@ -56,11 +59,9 @@ public class BookingController {
     @GetMapping
     public List<BookingDao> getBookings(@RequestHeader(name = "X-Sharer-User-Id") int userId,
                                         @RequestParam(defaultValue = "ALL") String state,
-                                        @RequestParam(defaultValue = "0") int from,
-                                        @RequestParam(defaultValue = "20") int size) {
+                                        @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                        @RequestParam(defaultValue = "20") @Positive int size) {
         log.info("Получен запрос на получение всех заказов от пользователя " + userId);
-
-        checkedFromAndSize(from, size);
 
         try {
             var newState = State.valueOf(state);
@@ -74,11 +75,9 @@ public class BookingController {
     @GetMapping("/owner")
     public List<BookingDao> getBookingsOwner(@RequestHeader(name = "X-Sharer-User-Id") int userId,
                                              @RequestParam(defaultValue = "ALL") String state,
-                                             @RequestParam(defaultValue = "0") int from,
-                                             @RequestParam(defaultValue = "20") int size) {
+                                             @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                             @RequestParam(defaultValue = "20") @Positive int size) {
         log.info("Получен запрос на получение всех заказов от пользователя " + userId);
-
-        checkedFromAndSize(from, size);
 
         try {
             var newState = State.valueOf(state);
@@ -94,12 +93,5 @@ public class BookingController {
         log.info("Получен запрос на удаление заказа " + id);
 
         return bookingServiceImpl.removeBooking(id);
-    }
-
-    private void checkedFromAndSize(int from, int size) {
-        if (from < 0)
-            throw new BadNumberException("from меньше 0");
-        if (size <= 0)
-            throw new BadNumberException("size меньше 0");
     }
 }

@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.comment.CommentDto;
 import ru.practicum.shareit.item.dto.item.ItemDto;
@@ -10,9 +11,10 @@ import ru.practicum.shareit.item.model.item.ItemMapper;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.service.ItemRequestServiceImpl;
 import ru.practicum.shareit.user.service.UserService;
-import ru.practicum.shareit.utils.exception.BadNumberException;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping("/items")
+@Validated
 public class ItemController {
     private final ItemService itemService;
     private final UserService userService;
@@ -75,7 +78,6 @@ public class ItemController {
                            @PathVariable int id) {
         log.info("Получен запрос на получение предмета " + id);
 
-
         var item = itemService.getItem(id);
 
         ItemDto itemDto = ItemMapper.toItemDto(item);
@@ -89,14 +91,9 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDto> getItems(@RequestHeader(name = "X-Sharer-User-Id") int userId,
-                                  @RequestParam(defaultValue = "0") int from,
-                                  @RequestParam(defaultValue = "20") int size) {
+                                  @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                  @RequestParam(defaultValue = "20") @Positive int size) {
         log.info("Получен запрос на получение всех предметов");
-
-        if (from < 0)
-            throw new BadNumberException("from меньше 0");
-        if (size <= 0)
-            throw new BadNumberException("size меньше 0");
 
         return itemService.getAllItemsByUser(userId, from / size, size).stream()
                 .map(ItemMapper::toItemDto)
@@ -113,14 +110,9 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemDto> searchItems(@RequestHeader(name = "X-Sharer-User-Id") int userId,
                                      @RequestParam(defaultValue = "") String text,
-                                     @RequestParam(defaultValue = "0") int from,
-                                     @RequestParam(defaultValue = "20") int size) {
+                                     @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                     @RequestParam(defaultValue = "20") @Positive int size) {
         log.info("Получен запрос на поиск " + text);
-
-        if (from < 0)
-            throw new BadNumberException("from меньше 0");
-        if (size <= 0)
-            throw new BadNumberException("size меньше 0");
 
         if (text.isEmpty() || text.isBlank()) {
             return Collections.emptyList();
