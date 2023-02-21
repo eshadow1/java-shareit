@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.service;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +10,7 @@ import ru.practicum.shareit.item.model.item.ItemMapper;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.utils.db.FromPageRequest;
 
 import java.util.List;
 import java.util.Locale;
@@ -82,7 +82,7 @@ public class ItemServiceImpl implements ItemService {
         final var tempText = "%" + text.toLowerCase(russianLocal) + "%";
 
         return itemRepository.searchItemsBy(tempText,
-                PageRequest.of(from, size, Sort.by(Sort.Direction.ASC, "id"))).getContent();
+                new FromPageRequest(from, size, Sort.by(Sort.Direction.ASC, "id"))).getContent();
     }
 
     @Override
@@ -143,7 +143,7 @@ public class ItemServiceImpl implements ItemService {
         if (user.isEmpty())
             return null;
         return itemRepository.findByOwner(user.get(),
-                        PageRequest.of(from, size, Sort.by(Sort.Direction.ASC, "id"))).stream()
+                        new FromPageRequest(from, size, Sort.by(Sort.Direction.ASC, "id"))).stream()
                 .map(item -> {
                     var lastAll = itemRepository.findAllLastBookingByItemId(item.getId());
                     BookingItemDao last = lastAll.isEmpty() ? null : lastAll.get(0);

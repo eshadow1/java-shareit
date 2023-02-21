@@ -66,7 +66,7 @@ public class BookingController {
         try {
             var newState = State.valueOf(state);
 
-            return bookingServiceImpl.getAllBookingUser(userId, newState, from / size, size);
+            return bookingServiceImpl.getAllBookingUser(userId, newState, from, size);
         } catch (IllegalArgumentException er) {
             throw new IllegalStateException("Unknown state: " + state);
         }
@@ -82,7 +82,7 @@ public class BookingController {
         try {
             var newState = State.valueOf(state);
 
-            return bookingServiceImpl.getAllBookingOwner(userId, newState, from / size, size);
+            return bookingServiceImpl.getAllBookingOwner(userId, newState, from, size);
         } catch (IllegalArgumentException er) {
             throw new IllegalStateException("Unknown state: " + state);
         }

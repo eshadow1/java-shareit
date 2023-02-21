@@ -95,7 +95,7 @@ public class ItemController {
                                   @RequestParam(defaultValue = "20") @Positive int size) {
         log.info("Получен запрос на получение всех предметов");
 
-        return itemService.getAllItemsByUser(userId, from / size, size).stream()
+        return itemService.getAllItemsByUser(userId, from, size).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
@@ -118,7 +118,7 @@ public class ItemController {
             return Collections.emptyList();
         }
 
-        return itemService.searchItems(userId, text, from / size, size).stream()
+        return itemService.searchItems(userId, text, from, size).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }

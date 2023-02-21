@@ -1,6 +1,5 @@
 package ru.practicum.shareit.request.service;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,6 +7,7 @@ import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.utils.db.FromPageRequest;
 import ru.practicum.shareit.utils.exception.ContainsFalseException;
 
 import java.util.List;
@@ -50,7 +50,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         checkedUser(userId, user);
 
         return itemRequestRepository.findItemRequestByRequestorIdNot(user.get(),
-                PageRequest.of(from, size, Sort.by(Sort.Direction.ASC, "created"))).getContent();
+                new FromPageRequest(from, size, Sort.by(Sort.Direction.ASC, "created"))).getContent();
     }
 
     private void checkedItemRequestContains(int id) {

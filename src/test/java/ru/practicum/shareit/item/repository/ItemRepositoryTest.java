@@ -4,13 +4,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.item.model.item.Item;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.utils.db.FromPageRequest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -50,7 +50,7 @@ class ItemRepositoryTest {
     @Test
     void searchItemsBy() {
         var items = itemRepository.searchItemsBy("Дрель",
-                PageRequest.of(0, 1, Sort.by(Sort.Direction.ASC, "id")));
+                new FromPageRequest(0, 1, Sort.by(Sort.Direction.ASC, "id")));
 
         assertEquals(items.getContent().size(), 1);
         assertEquals(items.getContent().get(0).getId(), item.getId());
@@ -69,7 +69,7 @@ class ItemRepositoryTest {
     @Test
     void findByOwner() {
         var items = itemRepository.findByOwner(user,
-                PageRequest.of(0, 1, Sort.by(Sort.Direction.ASC, "id")));
+                new FromPageRequest(0, 1, Sort.by(Sort.Direction.ASC, "id")));
 
         assertEquals(items.getContent().size(), 1);
     }

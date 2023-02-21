@@ -67,7 +67,7 @@ public class ItemRequestController {
                                                   @RequestParam(defaultValue = "1") @Positive int size) {
         log.info("Получен запрос на получение запросов с " + from + " размером " + size + " от пользователя " + userId);
 
-        return itemRequestService.getItemRequestFromSize(userId, from / size, size).stream()
+        return itemRequestService.getItemRequestFromSize(userId, from, size).stream()
                 .map(ItemRequestMapper::toItemRequestDto)
                 .collect(Collectors.toList());
     }

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +12,7 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.utils.db.FromPageRequest;
 
 import java.time.LocalDateTime;
 
@@ -83,7 +83,7 @@ class ItemRequestRepositoryTest {
     @Test
     void findItemRequestByRequestorIdNot() {
         var itemRequests = itemRequestRepository.findItemRequestByRequestorIdNot(user2,
-                PageRequest.of(0, 1, Sort.by(Sort.Direction.ASC, "created")));
+                new FromPageRequest(0, 1, Sort.by(Sort.Direction.ASC, "created")));
 
         assertEquals(itemRequests.getContent().size(), 1);
     }

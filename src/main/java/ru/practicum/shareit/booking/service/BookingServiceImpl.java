@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking.service;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +12,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.model.item.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.utils.db.FromPageRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -115,7 +115,7 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toList());
         List<Booking> allBooking;
         var time = LocalDateTime.now();
-        var pageRequest = PageRequest.of(from, size, Sort.by(Sort.Direction.DESC, "start"));
+        var pageRequest = new FromPageRequest(from, size, Sort.by(Sort.Direction.DESC, "start"));
 
         switch (state) {
             case ALL:
@@ -148,7 +148,7 @@ public class BookingServiceImpl implements BookingService {
 
     private List<BookingDao> getAllByUserAndState(int userId, State state, int from, int size) {
         List<Booking> allBooking;
-        var pageRequest = PageRequest.of(from, size, Sort.by(Sort.Direction.DESC, "start"));
+        var pageRequest = new FromPageRequest(from, size, Sort.by(Sort.Direction.DESC, "start"));
 
         switch (state) {
             case ALL:
