@@ -7,7 +7,7 @@ public class FromPageRequest extends PageRequest {
     int from;
 
     public FromPageRequest(int from, int size, Sort sort) {
-        super(from/size, size, sort);
+        super(from / size, size, sort);
         this.from = from;
     }
 
