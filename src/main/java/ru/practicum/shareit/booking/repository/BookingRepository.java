@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.model.Booking;
@@ -14,23 +16,23 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
     @Query("select i from Item as i where i.id = ?1")
     Optional<Item> getItem(Integer itemId);
 
-    List<Booking> findByBookerIdOrderByStartDesc(int userId);
+    Page<Booking> findByBookerId(int userId, Pageable pageable);
 
-    List<Booking> findByBookerIdAndStatusOrderByStartDesc(int userId, Status status);
+    Page<Booking> findByBookerIdAndStatus(int userId, Status status, Pageable pageable);
 
-    List<Booking> findByBookerIdAndStartAfterOrderByStartDesc(int userId, LocalDateTime time);
+    Page<Booking> findByBookerIdAndStartAfter(int userId, LocalDateTime time, Pageable pageable);
 
-    List<Booking> findByBookerIdAndEndBeforeOrderByStartDesc(int userId, LocalDateTime time);
+    Page<Booking> findByBookerIdAndEndBefore(int userId, LocalDateTime time, Pageable pageable);
 
-    List<Booking> findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(int userId, LocalDateTime timeAfter, LocalDateTime timeBefore);
+    Page<Booking> findByBookerIdAndStartBeforeAndEndAfter(int userId, LocalDateTime timeAfter, LocalDateTime timeBefore, Pageable pageable);
 
-    List<Booking> findByItemIdInOrderByStartDesc(List<Integer> items);
+    Page<Booking> findByItemIdIn(List<Integer> items, Pageable pageable);
 
-    List<Booking> findByItemIdInAndStatusOrderByStartDesc(List<Integer> items, Status status);
+    Page<Booking> findByItemIdInAndStatus(List<Integer> items, Status status, Pageable pageable);
 
-    List<Booking> findByItemIdInAndStartAfterOrderByStartDesc(List<Integer> items, LocalDateTime time);
+    Page<Booking> findByItemIdInAndStartAfter(List<Integer> items, LocalDateTime time, Pageable pageable);
 
-    List<Booking> findByItemIdInAndEndBeforeOrderByStartDesc(List<Integer> items, LocalDateTime time);
+    Page<Booking> findByItemIdInAndEndBefore(List<Integer> items, LocalDateTime time, Pageable pageable);
 
-    List<Booking> findByItemIdInAndStartBeforeAndEndAfterOrderByStartDesc(List<Integer> items, LocalDateTime timeAfter, LocalDateTime timeBefore);
+    Page<Booking> findByItemIdInAndStartBeforeAndEndAfter(List<Integer> items, LocalDateTime timeAfter, LocalDateTime timeBefore, Pageable pageable);
 }

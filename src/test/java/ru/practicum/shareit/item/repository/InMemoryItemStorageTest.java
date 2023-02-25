@@ -99,5 +99,9 @@ class InMemoryItemStorageTest {
 
     @Test
     void searchItems() {
+        itemStorage.add(correctItem);
+        var items = itemStorage.searchItems("test");
+
+        assertEquals(items.size(), 1);
     }
 }

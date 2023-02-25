@@ -13,9 +13,9 @@ public interface BookingService {
 
     BookingDao getBooking(int bookingId, int userId);
 
-    List<BookingDao> getAllBookingUser(int userId, State state);
+    List<BookingDao> getAllBookingUser(int userId, State state, int from, int size);
 
-    List<BookingDao> getAllBookingOwner(int userId, State state);
+    List<BookingDao> getAllBookingOwner(int userId, State state, int from, int size);
 
     BookingDao removeBooking(int bookingId);
 }

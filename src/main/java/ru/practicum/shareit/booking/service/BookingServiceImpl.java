@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.service;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDao;
 import ru.practicum.shareit.booking.model.BookingMapper;
 import ru.practicum.shareit.booking.model.State;
@@ -10,6 +12,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.model.item.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.utils.db.FromPageRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,6 +20,7 @@ import java.util.stream.Collectors;
 
 
 @Service
+@Transactional
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
@@ -80,16 +84,16 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDao> getAllBookingUser(int userId, State state) {
+    public List<BookingDao> getAllBookingUser(int userId, State state, int from, int size) {
         CheckerBooking.checkedUserContains(userRepository, userId);
-        return getAllByUserAndState(userId, state);
+        return getAllByUserAndState(userId, state, from, size);
     }
 
     @Override
-    public List<BookingDao> getAllBookingOwner(int userId, State state) {
+    public List<BookingDao> getAllBookingOwner(int userId, State state, int from, int size) {
         CheckerBooking.checkedUserContains(userRepository, userId);
         var items = itemService.getAllByUser(userId);
-        return getAllByItems(items, state);
+        return getAllByItems(items, state, from, size);
     }
 
     @Override
@@ -105,30 +109,32 @@ public class BookingServiceImpl implements BookingService {
                 bookingRepository.getItem(temp.getItemId()).orElse(null)) : null;
     }
 
-    private List<BookingDao> getAllByItems(List<Item> items, State state) {
+    private List<BookingDao> getAllByItems(List<Item> items, State state, int from, int size) {
         var allItem = items.stream()
                 .map(Item::getId)
                 .collect(Collectors.toList());
         List<Booking> allBooking;
         var time = LocalDateTime.now();
+        var pageRequest = new FromPageRequest(from, size, Sort.by(Sort.Direction.DESC, "start"));
+
         switch (state) {
             case ALL:
-                allBooking = bookingRepository.findByItemIdInOrderByStartDesc(allItem);
+                allBooking = bookingRepository.findByItemIdIn(allItem, pageRequest).getContent();
                 break;
             case WAITING:
-                allBooking = bookingRepository.findByItemIdInAndStatusOrderByStartDesc(allItem, Status.WAITING);
+                allBooking = bookingRepository.findByItemIdInAndStatus(allItem, Status.WAITING, pageRequest).getContent();
                 break;
             case REJECTED:
-                allBooking = bookingRepository.findByItemIdInAndStatusOrderByStartDesc(allItem, Status.REJECTED);
+                allBooking = bookingRepository.findByItemIdInAndStatus(allItem, Status.REJECTED, pageRequest).getContent();
                 break;
             case PAST:
-                allBooking = bookingRepository.findByItemIdInAndEndBeforeOrderByStartDesc(allItem, time);
+                allBooking = bookingRepository.findByItemIdInAndEndBefore(allItem, time, pageRequest).getContent();
                 break;
             case FUTURE:
-                allBooking = bookingRepository.findByItemIdInAndStartAfterOrderByStartDesc(allItem, time);
+                allBooking = bookingRepository.findByItemIdInAndStartAfter(allItem, time, pageRequest).getContent();
                 break;
             case CURRENT:
-                allBooking = bookingRepository.findByItemIdInAndStartBeforeAndEndAfterOrderByStartDesc(allItem, time, time);
+                allBooking = bookingRepository.findByItemIdInAndStartBeforeAndEndAfter(allItem, time, time, pageRequest).getContent();
                 break;
             default:
                 throw new IllegalStateException("Unknown state: " + state);
@@ -140,27 +146,29 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toList());
     }
 
-    private List<BookingDao> getAllByUserAndState(int userId, State state) {
+    private List<BookingDao> getAllByUserAndState(int userId, State state, int from, int size) {
         List<Booking> allBooking;
+        var pageRequest = new FromPageRequest(from, size, Sort.by(Sort.Direction.DESC, "start"));
+
         switch (state) {
             case ALL:
-                allBooking = bookingRepository.findByBookerIdOrderByStartDesc(userId);
+                allBooking = bookingRepository.findByBookerId(userId, pageRequest).getContent();
                 break;
             case WAITING:
-                allBooking = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING);
+                allBooking = bookingRepository.findByBookerIdAndStatus(userId, Status.WAITING, pageRequest).getContent();
                 break;
             case REJECTED:
-                allBooking = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, Status.REJECTED);
+                allBooking = bookingRepository.findByBookerIdAndStatus(userId, Status.REJECTED, pageRequest).getContent();
                 break;
             case PAST:
-                allBooking = bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now());
+                allBooking = bookingRepository.findByBookerIdAndEndBefore(userId, LocalDateTime.now(), pageRequest).getContent();
                 break;
             case FUTURE:
-                allBooking = bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now());
+                allBooking = bookingRepository.findByBookerIdAndStartAfter(userId, LocalDateTime.now(), pageRequest).getContent();
                 break;
             case CURRENT:
                 var time = LocalDateTime.now();
-                allBooking = bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, time, time);
+                allBooking = bookingRepository.findByBookerIdAndStartBeforeAndEndAfter(userId, time, time, pageRequest).getContent();
                 break;
             default:
                 throw new IllegalStateException("Unknown state: " + state);

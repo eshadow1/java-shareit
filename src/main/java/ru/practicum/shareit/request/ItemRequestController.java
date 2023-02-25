@@ -1,14 +1,19 @@
 package ru.practicum.shareit.request;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.model.ItemRequestMapper;
 import ru.practicum.shareit.request.service.ItemRequestService;
+import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * TODO Sprint add-item-requests.
@@ -16,44 +21,54 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(path = "/requests")
+@Validated
 public class ItemRequestController {
     private final ItemRequestService itemRequestService;
+    private final UserService userService;
 
-    public ItemRequestController(ItemRequestService itemRequestService) {
+    public ItemRequestController(ItemRequestService itemRequestService,
+                                 UserService userService) {
         this.itemRequestService = itemRequestService;
+        this.userService = userService;
     }
 
     @PostMapping
-    public ResponseEntity<ItemRequest> addItemRequest(@Valid @RequestBody ItemRequest itemRequest) {
-        log.info("Получен запрос на добавление запроса: " + itemRequest);
+    public ItemRequestDto addItemRequest(@RequestHeader(name = "X-Sharer-User-Id") int userId,
+                                         @Valid @RequestBody ItemRequestDto itemRequest) {
+        log.info("Получен запрос на добавление запроса " + itemRequest + " для пользователя " + userId);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(itemRequestService.addItemRequest(itemRequest));
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<ItemRequest> updateItemRequest(@PathVariable int id, @RequestBody ItemRequest itemRequest) {
-        log.info("Получен запрос на обновление запроса " + id + ": " + itemRequest);
-
-        return ResponseEntity.status(HttpStatus.OK).body(itemRequestService.updateItemRequest(id, itemRequest));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<ItemRequest> getItemRequest(@PathVariable int id) {
-        log.info("Получен запрос на получение запроса " + id);
-
-        return ResponseEntity.status(HttpStatus.OK).body(itemRequestService.getItemRequest(id));
+        return ItemRequestMapper.toItemRequestDto(itemRequestService.addItemRequest(ItemRequestMapper.fromItemRequestDto(itemRequest.toBuilder()
+                        .created(LocalDateTime.now())
+                        .build(),
+                userService.getUser(userId))));
     }
 
     @GetMapping
-    public List<ItemRequest> getItemRequests() {
-        log.info("Получен запрос на получение всех запросов");
-        return itemRequestService.getAllItemRequest();
+    public List<ItemRequestDto> getItemRequests(@RequestHeader(name = "X-Sharer-User-Id") int userId) {
+        log.info("Получен запрос на получение всех своих запросов для пользователя " + userId);
+
+        return itemRequestService.getAllItemRequestByUser(userId).stream()
+                .map(ItemRequestMapper::toItemRequestDto)
+                .collect(Collectors.toList());
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ItemRequest> removeUser(@PathVariable int id) {
-        log.info("Получен запрос на удаление запроса " + id);
+    @GetMapping("/{id}")
+    public ItemRequestDto getItemRequest(@RequestHeader(name = "X-Sharer-User-Id") int userId,
+                                         @PathVariable int id) {
+        log.info("Получен запрос на получение запроса с " + id + " от пользователя " + userId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(itemRequestService.removeItemRequest(id));
+        return ItemRequestMapper.toItemRequestDto(itemRequestService.getItemRequest(userId, id));
+    }
+
+    @GetMapping("/all")
+    @Validated
+    public List<ItemRequestDto> getAllItemRequest(@RequestHeader(name = "X-Sharer-User-Id") int userId,
+                                                  @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                                  @RequestParam(defaultValue = "1") @Positive int size) {
+        log.info("Получен запрос на получение запросов с " + from + " размером " + size + " от пользователя " + userId);
+
+        return itemRequestService.getItemRequestFromSize(userId, from, size).stream()
+                .map(ItemRequestMapper::toItemRequestDto)
+                .collect(Collectors.toList());
     }
 }

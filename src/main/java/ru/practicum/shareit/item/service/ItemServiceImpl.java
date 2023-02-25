@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item.service;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingItemDao;
 import ru.practicum.shareit.item.model.comment.Comment;
 import ru.practicum.shareit.item.model.item.Item;
@@ -8,6 +10,7 @@ import ru.practicum.shareit.item.model.item.ItemMapper;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.utils.db.FromPageRequest;
 
 import java.util.List;
 import java.util.Locale;
@@ -15,6 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final CommentRepository commentRepository;
@@ -58,10 +62,10 @@ public class ItemServiceImpl implements ItemService {
         return get(itemId);
     }
 
-    public List<Item> getAllItemsByUser(int userId) {
+    public List<Item> getAllItemsByUser(int userId, int from, int size) {
         CheckerItem.checkedUserContains(userRepository, userId);
 
-        return getAllByUser(userId);
+        return getAllByUser(userId, from, size);
     }
 
     public Item removeItem(int itemId) {
@@ -71,13 +75,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<Item> searchItems(int userId, String text) {
+    public List<Item> searchItems(int userId, String text, int from, int size) {
         CheckerItem.checkedUserContains(userRepository, userId);
 
         final var russianLocal = new Locale("ru");
         final var tempText = "%" + text.toLowerCase(russianLocal) + "%";
 
-        return itemRepository.searchItemsBy(tempText);
+        return itemRepository.searchItemsBy(tempText,
+                new FromPageRequest(from, size, Sort.by(Sort.Direction.ASC, "id"))).getContent();
     }
 
     @Override
@@ -131,6 +136,28 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public boolean contains(Integer itemId) {
         return itemRepository.findById(itemId).isPresent();
+    }
+
+    public List<Item> getAllByUser(int userId, int from, int size) {
+        var user = itemRepository.getUser(userId);
+        if (user.isEmpty())
+            return null;
+        return itemRepository.findByOwner(user.get(),
+                        new FromPageRequest(from, size, Sort.by(Sort.Direction.ASC, "id"))).stream()
+                .map(item -> {
+                    var lastAll = itemRepository.findAllLastBookingByItemId(item.getId());
+                    BookingItemDao last = lastAll.isEmpty() ? null : lastAll.get(0);
+
+                    var futureAll = itemRepository.findAllFutureBookingByItemId(item.getId());
+                    BookingItemDao future = futureAll.isEmpty() ? null : futureAll.get(0);
+
+                    return item.toBuilder()
+                            .comments(commentRepository.findAllByItemId(item.getId()))
+                            .lastBooking(last)
+                            .nextBooking(future)
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 
     private Optional<Comment> addCommentOrEmpty(Comment comment) {

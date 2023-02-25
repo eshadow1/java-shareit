@@ -1,5 +1,7 @@
 package ru.practicum.shareit.item.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.dto.BookingItemDao;
@@ -14,11 +16,11 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
             "FROM Item AS i " +
             "WHERE i.isAvailable = true AND (lower(i.name) LIKE lower(?1)  OR lower(i.description) LIKE lower(?1)) " +
             "ORDER BY i.id")
-    List<Item> searchItemsBy(String tempText);
+    Page<Item> searchItemsBy(String tempText, Pageable pageable);
 
     List<Item> findByOwnerOrderByIdAsc(User user);
 
-    List<Item> findByIdAndOwnerOrderByIdAsc(int itemId, int userId);
+    Page<Item> findByOwner(User user, Pageable pageable);
 
     @Query("SELECT new ru.practicum.shareit.booking.dto.BookingItemDao(b.id, b.bookerId) " +
             "FROM Booking AS b " +

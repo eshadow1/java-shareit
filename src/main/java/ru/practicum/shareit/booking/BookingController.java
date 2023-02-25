@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDao;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -10,6 +11,8 @@ import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 /**
@@ -19,6 +22,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(path = "/bookings")
+@Validated
 public class BookingController {
     private final BookingService bookingServiceImpl;
 
@@ -54,13 +58,15 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDao> getBookings(@RequestHeader(name = "X-Sharer-User-Id") int userId,
-                                        @RequestParam(defaultValue = "ALL") String state) {
+                                        @RequestParam(defaultValue = "ALL") String state,
+                                        @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                        @RequestParam(defaultValue = "20") @Positive int size) {
         log.info("Получен запрос на получение всех заказов от пользователя " + userId);
 
         try {
             var newState = State.valueOf(state);
 
-            return bookingServiceImpl.getAllBookingUser(userId, newState);
+            return bookingServiceImpl.getAllBookingUser(userId, newState, from, size);
         } catch (IllegalArgumentException er) {
             throw new IllegalStateException("Unknown state: " + state);
         }
@@ -68,12 +74,15 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<BookingDao> getBookingsOwner(@RequestHeader(name = "X-Sharer-User-Id") int userId,
-                                             @RequestParam(defaultValue = "ALL") String state) {
+                                             @RequestParam(defaultValue = "ALL") String state,
+                                             @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                             @RequestParam(defaultValue = "20") @Positive int size) {
         log.info("Получен запрос на получение всех заказов от пользователя " + userId);
+
         try {
             var newState = State.valueOf(state);
 
-            return bookingServiceImpl.getAllBookingOwner(userId, newState);
+            return bookingServiceImpl.getAllBookingOwner(userId, newState, from, size);
         } catch (IllegalArgumentException er) {
             throw new IllegalStateException("Unknown state: " + state);
         }
