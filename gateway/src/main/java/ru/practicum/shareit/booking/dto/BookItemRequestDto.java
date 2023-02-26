@@ -13,9 +13,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookItemRequestDto {
-	private long itemId;
+	private long id;
+
 	@FutureOrPresent
 	private LocalDateTime start;
+
 	@Future
 	private LocalDateTime end;
+
+	private Integer itemId;
+
+	private Integer bookerId;
+
+	private BookingState status;
 }
