@@ -73,7 +73,7 @@ class ItemRequestServiceImplTest {
         incorrectItemRequest = ItemRequest.builder()
                 .id(1)
                 .description("itemTest")
-                .requestorId(user)
+                .requestorId(user2)
                 .build();
     }
 
