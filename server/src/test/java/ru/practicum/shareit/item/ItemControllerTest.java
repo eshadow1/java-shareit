@@ -15,7 +15,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import ru.practicum.shareit.item.model.comment.Comment;
 import ru.practicum.shareit.item.model.item.Item;
 import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.request.service.ItemRequestServiceImpl;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.utils.exception.UserNotFoundException;
@@ -56,9 +55,6 @@ class ItemControllerTest {
 
     @MockBean
     private UserService userService;
-
-    @MockBean
-    private ItemRequestServiceImpl itemRequestService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -280,42 +276,6 @@ class ItemControllerTest {
 
         verify(itemService, times(1))
                 .searchItems(anyInt(), anyString(), anyInt(), anyInt());
-    }
-
-    @Test
-    void searchItemsWithThrowSizeBadNumber() {
-        try {
-            mockMvc.perform(get(endpoint + "/search")
-                            .characterEncoding(StandardCharsets.UTF_8)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .header("X-Sharer-User-Id", 1)
-                            .param("text", "test")
-                            .param("from", "0")
-                            .param("size", "0")
-                            .accept(MediaType.APPLICATION_JSON)
-                    ).andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isBadRequest());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Test
-    void searchItemsWithThrowFromBadNumber() {
-        try {
-            mockMvc.perform(get(endpoint + "/search")
-                            .characterEncoding(StandardCharsets.UTF_8)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .header("X-Sharer-User-Id", 1)
-                            .param("text", "test")
-                            .param("from", "-1")
-                            .param("size", "1")
-                            .accept(MediaType.APPLICATION_JSON)
-                    ).andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isBadRequest());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Test

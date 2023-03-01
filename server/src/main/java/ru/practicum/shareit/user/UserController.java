@@ -8,7 +8,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.model.UserMapper;
 import ru.practicum.shareit.user.service.UserService;
 
-import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -28,7 +27,7 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User addUser(@Valid @RequestBody UserDto user) {
+    public User addUser(@RequestBody UserDto user) {
         log.info("Получен запрос на добавление пользователя: " + user);
 
         return userService.addUser(UserMapper.fromUserDto(user, USER_WITHOUT_ID));

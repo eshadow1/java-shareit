@@ -2,7 +2,6 @@ package ru.practicum.shareit.item;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.comment.CommentDto;
 import ru.practicum.shareit.item.dto.item.ItemDto;
@@ -12,9 +11,6 @@ import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.service.ItemRequestServiceImpl;
 import ru.practicum.shareit.user.service.UserService;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,7 +22,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping("/items")
-@Validated
 public class ItemController {
     private final ItemService itemService;
     private final UserService userService;
@@ -43,7 +38,7 @@ public class ItemController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ItemDto addItem(@RequestHeader(name = "X-Sharer-User-Id") int userId,
-                           @Valid @RequestBody ItemDto itemDto) {
+                           @RequestBody ItemDto itemDto) {
         log.info("Получен запрос на добавление предмета: " + itemDto);
 
         return ItemMapper.toItemDto(itemService.addItem((itemDto.getRequestId() != null)
@@ -54,7 +49,7 @@ public class ItemController {
     @PostMapping("/{id}/comment")
     public CommentDto addItemComment(@RequestHeader(name = "X-Sharer-User-Id") int userId,
                                      @PathVariable int id,
-                                     @Valid @RequestBody CommentDto comment) {
+                                     @RequestBody CommentDto comment) {
         log.info("Получен запрос на добавление коментария к предмету: " + id);
 
         return CommentMapper.toCommentDto(itemService.addComment(
@@ -91,8 +86,8 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDto> getItems(@RequestHeader(name = "X-Sharer-User-Id") int userId,
-                                  @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-                                  @RequestParam(defaultValue = "20") @Positive int size) {
+                                  @RequestParam(defaultValue = "0") int from,
+                                  @RequestParam(defaultValue = "20") int size) {
         log.info("Получен запрос на получение всех предметов");
 
         return itemService.getAllItemsByUser(userId, from, size).stream()
@@ -110,8 +105,8 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemDto> searchItems(@RequestHeader(name = "X-Sharer-User-Id") int userId,
                                      @RequestParam(defaultValue = "") String text,
-                                     @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-                                     @RequestParam(defaultValue = "20") @Positive int size) {
+                                     @RequestParam(defaultValue = "0") int from,
+                                     @RequestParam(defaultValue = "20") int size) {
         log.info("Получен запрос на поиск " + text);
 
         if (text.isEmpty() || text.isBlank()) {

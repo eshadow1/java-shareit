@@ -13,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import ru.practicum.shareit.booking.dto.BookingDao;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.dto.item.ItemDao;
@@ -41,8 +40,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class BookingControllerTest {
     private static String endpoint;
 
-    private static Booking booking;
-
     private static BookingDao bookingDao;
 
     private static String jsonBooking;
@@ -56,15 +53,6 @@ class BookingControllerTest {
     @BeforeAll
     public static void beforeAll() {
         endpoint = "/bookings";
-
-        booking = Booking.builder()
-                .id(1)
-                .start(LocalDateTime.of(2021, 1, 1, 1, 0, 1))
-                .end(LocalDateTime.of(2021, 1, 1, 1, 1, 1))
-                .itemId(1)
-                .bookerId(1)
-                .status(Status.WAITING)
-                .build();
 
         var itemDao = ItemDao.builder()
                 .id(1)
@@ -256,42 +244,6 @@ class BookingControllerTest {
 
         verify(bookingService, times(1))
                 .getAllBookingOwner(anyInt(), any(), anyInt(), anyInt());
-    }
-
-    @Test
-    void getBookingsOwnerFromError() {
-        try {
-            mockMvc.perform(get(endpoint + "/owner")
-                            .content(jsonBooking)
-                            .characterEncoding(StandardCharsets.UTF_8)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .header("X-Sharer-User-Id", 1)
-                            .param("from", "-1")
-                            .param("size", "1")
-                            .accept(MediaType.APPLICATION_JSON)
-                    ).andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isBadRequest());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Test
-    void getBookingsOwnerSizeError() {
-        try {
-            mockMvc.perform(get(endpoint + "/owner")
-                            .content(jsonBooking)
-                            .characterEncoding(StandardCharsets.UTF_8)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .header("X-Sharer-User-Id", 1)
-                            .param("from", "0")
-                            .param("size", "0")
-                            .accept(MediaType.APPLICATION_JSON)
-                    ).andDo(MockMvcResultHandlers.print())
-                    .andExpect(status().isBadRequest());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Test

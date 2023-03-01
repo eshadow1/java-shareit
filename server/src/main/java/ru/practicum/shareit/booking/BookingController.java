@@ -2,7 +2,6 @@ package ru.practicum.shareit.booking;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDao;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -10,9 +9,6 @@ import ru.practicum.shareit.booking.model.BookingMapper;
 import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.service.BookingService;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 /**
@@ -22,7 +18,6 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping(path = "/bookings")
-@Validated
 public class BookingController {
     private final BookingService bookingServiceImpl;
 
@@ -33,7 +28,7 @@ public class BookingController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public BookingDao addBooking(@RequestHeader(name = "X-Sharer-User-Id") int userId,
-                                 @Valid @RequestBody BookingDto booking) {
+                                 @RequestBody BookingDto booking) {
         log.info("Получен запрос на добавление заказа: " + booking);
 
         return bookingServiceImpl.addBooking(BookingMapper.fromBookingDto(booking, userId));
@@ -59,8 +54,8 @@ public class BookingController {
     @GetMapping
     public List<BookingDao> getBookings(@RequestHeader(name = "X-Sharer-User-Id") int userId,
                                         @RequestParam(defaultValue = "ALL") String state,
-                                        @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-                                        @RequestParam(defaultValue = "20") @Positive int size) {
+                                        @RequestParam(defaultValue = "0") int from,
+                                        @RequestParam(defaultValue = "20") int size) {
         log.info("Получен запрос на получение всех заказов от пользователя " + userId);
 
         try {
@@ -75,8 +70,8 @@ public class BookingController {
     @GetMapping("/owner")
     public List<BookingDao> getBookingsOwner(@RequestHeader(name = "X-Sharer-User-Id") int userId,
                                              @RequestParam(defaultValue = "ALL") String state,
-                                             @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-                                             @RequestParam(defaultValue = "20") @Positive int size) {
+                                             @RequestParam(defaultValue = "0") int from,
+                                             @RequestParam(defaultValue = "20") int size) {
         log.info("Получен запрос на получение всех заказов от пользователя " + userId);
 
         try {

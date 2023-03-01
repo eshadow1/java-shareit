@@ -47,8 +47,6 @@ class UserControllerTest {
 
     private static User updateUser;
 
-    private static String jsonUserWithoutEmail;
-
     private static String jsonUserWithIncorrectEmail;
 
     @MockBean
@@ -75,10 +73,6 @@ class UserControllerTest {
         jsonCorrectUser = "{" +
                 "    \"name\": \"user\"," +
                 "    \"email\": \"user@user.com\"" +
-                "}";
-
-        jsonUserWithoutEmail = "{" +
-                "    \"name\": \"user\"" +
                 "}";
 
         jsonUserWithIncorrectEmail = "{" +
@@ -116,34 +110,6 @@ class UserControllerTest {
         }
 
         verify(userService, times(1)).addUser(any());
-    }
-
-    @Test
-    void addUserWithoutEmail() {
-        try {
-            mockMvc.perform(post(endpoint)
-                    .content(jsonUserWithoutEmail)
-                    .contentType(MediaType.APPLICATION_JSON)
-            ).andExpect(status().isBadRequest());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        verify(userService, times(0)).addUser(any());
-    }
-
-    @Test
-    void addUserWithIncorrectEmail() {
-        try {
-            mockMvc.perform(post(endpoint)
-                    .content(jsonUserWithIncorrectEmail)
-                    .contentType(MediaType.APPLICATION_JSON)
-            ).andExpect(status().isBadRequest());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        verify(userService, times(0)).addUser(any());
     }
 
     @Test
