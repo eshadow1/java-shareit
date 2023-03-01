@@ -1,7 +1,10 @@
 version: '3.8'
 services:
   gateway:
-    build: gateway/.
+    image: amazoncorretto:11-alpine-jdk
+    build:
+      context: gateway/.
+      dockerfile: Dockerfile
     container_name: shared-it-gateway
     ports:
       - "8080:8080"
@@ -12,7 +15,10 @@ services:
     restart: on-failure
 
   server:
-    build: server/.
+    image: amazoncorretto:11
+    build:
+      context: server/.
+      dockerfile: Dockerfile
     container_name: shared-it-server
     ports:
       - "9090:9090"
@@ -20,7 +26,9 @@ services:
       - db
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/postgres
-    restart: on-failure
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
 
   db:
     image: postgres:13.7-alpine
