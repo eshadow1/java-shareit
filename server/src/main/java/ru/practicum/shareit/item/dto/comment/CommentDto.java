@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,7 +12,6 @@ import javax.validation.constraints.NotBlank;
 public class CommentDto {
     private int id;
 
-    @NotBlank
     private String text;
 
     private Integer itemId;

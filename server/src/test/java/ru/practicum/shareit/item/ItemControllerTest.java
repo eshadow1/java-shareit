@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import ru.practicum.shareit.item.model.comment.Comment;
 import ru.practicum.shareit.item.model.item.Item;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.request.service.ItemRequestServiceImpl;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.utils.exception.UserNotFoundException;
@@ -55,6 +56,9 @@ class ItemControllerTest {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private ItemRequestServiceImpl itemRequestService;
 
     @Autowired
     private MockMvc mockMvc;
