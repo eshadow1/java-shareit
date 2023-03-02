@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.booking.model.Status;
 
 import java.time.LocalDateTime;
 
@@ -18,8 +17,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class BookingDto {
-    private int id;
-
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime start;
 
@@ -27,8 +24,4 @@ public class BookingDto {
     private LocalDateTime end;
 
     private Integer itemId;
-
-    private Integer bookerId;
-
-    private Status status;
 }

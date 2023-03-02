@@ -14,19 +14,16 @@ public class BookingMapper {
                 .start(bookingDto.getStart())
                 .end(bookingDto.getEnd())
                 .itemId(bookingDto.getItemId())
-                .status(bookingDto.getStatus())
+                .status(Status.WAITING)
                 .bookerId(bookerId)
                 .build();
     }
 
-    public static BookingDto toBookingDto(final Booking item) {
+    public static BookingDto toBookingDto(final Booking booking) {
         return BookingDto.builder()
-                .id(item.getId())
-                .itemId(item.getItemId())
-                .bookerId(item.getBookerId())
-                .start(item.getStart())
-                .end(item.getEnd())
-                .status(item.getStatus())
+                .start(booking.getStart())
+                .end(booking.getEnd())
+                .itemId(booking.getItemId())
                 .build();
     }
 

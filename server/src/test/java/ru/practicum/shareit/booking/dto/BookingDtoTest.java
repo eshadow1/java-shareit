@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
-import ru.practicum.shareit.booking.model.Status;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -21,12 +20,9 @@ class BookingDtoTest {
     @Test
     void serializeInCorrectFormat() throws IOException {
         BookingDto receipt = new BookingDto(
-                1,
                 LocalDateTime.of(2021, 5, 9, 16, 0),
                 LocalDateTime.of(2021, 5, 9, 16, 1),
-                1,
-                1,
-                Status.REJECTED);
+                1);
 
         JsonContent<BookingDto> json = jacksonTester.write(receipt);
 

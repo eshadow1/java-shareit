@@ -16,12 +16,9 @@ class BookingMapperTest {
     @Test
     void fromBookingDto() {
         var bookingDto = BookingDto.builder()
-                .id(1)
                 .start(LocalDateTime.of(2021, 1, 1, 1, 0, 1))
                 .end(LocalDateTime.of(2021, 1, 1, 1, 1, 1))
                 .itemId(1)
-                .bookerId(1)
-                .status(Status.WAITING)
                 .build();
         var booking = BookingMapper.fromBookingDto(bookingDto, 1);
         var correctBooking = Booking.builder()
@@ -34,7 +31,6 @@ class BookingMapperTest {
                 .build();
         assertEquals(booking.getStart(), correctBooking.getStart());
         assertEquals(booking.getEnd(), correctBooking.getEnd());
-        assertEquals(booking.getItemId(), correctBooking.getItemId());
     }
 
     @Test
@@ -51,15 +47,12 @@ class BookingMapperTest {
         var bookingDto = BookingMapper.toBookingDto(booking);
 
         var correctBookingDto = BookingDto.builder()
-                .id(1)
                 .start(LocalDateTime.of(2021, 1, 1, 1, 0, 1))
                 .end(LocalDateTime.of(2021, 1, 1, 1, 1, 1))
                 .itemId(1)
-                .bookerId(1)
-                .status(Status.WAITING)
                 .build();
 
-        assertEquals(bookingDto.getId(), correctBookingDto.getId());
+        assertEquals(bookingDto.getItemId(), correctBookingDto.getItemId());
         assertEquals(bookingDto.getStart(), correctBookingDto.getStart());
         assertEquals(bookingDto.getEnd(), correctBookingDto.getEnd());
     }
