@@ -1,0 +1,43 @@
+version: '3.8'
+services:
+  gateway:
+    image: sharedit-gateway
+    build:
+      context: gateway/.
+      dockerfile: Dockerfile
+    container_name: shared-it-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - server
+    environment:
+      - SHAREIT_SERVER_URL=http://server:9090
+    restart: on-failure
+
+  server:
+    image: sharedit-server
+    build:
+      context: server/.
+      dockerfile: Dockerfile
+    container_name: shared-it-server
+    ports:
+      - "9090:9090"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  db:
+    image: postgres:13.7-alpine
+    container_name: db-postgres
+    volumes:
+      - /var/lib/postgresql/data/
+    ports:
+      - "6541:5432"
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
