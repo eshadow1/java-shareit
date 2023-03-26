@@ -1,2 +1,7 @@
 # java-shareit
-Template repository for Shareit project.
+
+Приложение для оценки фильмов и подборки фильмов с учетом предпочтений друзей.
+
+## Стек технологий
+  
+  Java, Spring, Spring Boot, Maven, H2
